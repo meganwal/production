@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Production Task</title>
+    <script src="https://unpkg.com/jspsych@7.0.0"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.0.0"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-html-button-response@1.0.0"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-image-button-response@1.0.0"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-preload@1.0.0"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-survey-text@1.0.0"></script>
+    <link href="https://unpkg.com/jspsych@7.0.0/css/jspsych.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
+  </head>
+  <body></body>
+  <script>
+     const jsPsych = initJsPsych();
+
+     var timeline = [];
+
+     var preload = {
+       type: jsPsychPreload,
+       images: ['img/bird1.png', 'img/bird2.png', 'img/bird3.png', 'img/bird4.png',
+        'img/bird5.png', 'img/bird6.png']
+     };
+     timeline.push(preload);
+
+     var welcome = {
+       type: jsPsychHtmlKeyboardResponse,
+       stimulus: "Welcome to the experiment. Press any key to begin."
+     };
+    timeline.push(welcome);
+
+
+    var semantic_stimuli = [
+       { stimulus: "img/bird1.png", correct_response: 'tust'},
+       { stimulus: "img/bird2.png", correct_response: 'poom'},
+       { stimulus: "img/bird3.png", correct_response: 'hux'},
+       { stimulus: "img/bird4.png", correct_response: 'wilp'},
+       { stimulus: "img/bird5.png", correct_response: 'reng'},
+       { stimulus: "img/bird6.png", correct_response: 'bosa'}
+     ];
+
+     var multi_comp_stimuli = [
+        {target: "img/bird1.png", foils: ["img/bird2.png", "img/bird3.png", "img/bird4.png", "img/bird5.png", "img/bird6.png"],
+        choice1: 'tust', choice2: 'poom', target_word: 'tust'}
+      ];
+
+     var study = {
+       type: jsPsychHtmlKeyboardResponse,
+       stimulus: function() {
+         var image = "<img style='height:400px;' src='" + jsPsych.timelineVariable('stimulus', true) +
+         "'>"
+         var text = "<p>This is a <strong>" + jsPsych.timelineVariable('correct_response', true) + "</strong></p>"
+         return image + text
+       },
+       choices: "NO_KEYS",
+       trial_duration: 3000,
+     };
+
+     var production = {
+      type: jsPsychSurveyText,
+      preamble: function() {
+        var target = "<img style='height:400px;' src='" + jsPsych.timelineVariable('stimulus', true) +
+        "'>"
+        return target;
+      },
+      questions: [
+        {prompt: 'What is this called?', rows:1}
+      ],
+    };
+
+     var fixation = {
+       type: jsPsychHtmlKeyboardResponse,
+       stimulus: '<div style="font-size:60px;">+</div>',
+       choices: "NO_KEYS",
+       trial_duration: 1000,
+     };
+
+     var multi_comprehension_trial = {
+       type: jsPsychHtmlButtonResponse,
+       stimulus: function(){
+         var target = ("<img style='border: 10px solid blue; margin: 50px'" +
+         "src='" + jsPsych.timelineVariable('target', true) +
+         "' height='200px'>");
+
+         function make_foil(img) {
+           return "<img style='margin: 50px' src='" + img +  "' height='200px'>"
+         }
+
+        var foils = _.map(jsPsych.timelineVariable('foils', true), make_foil)
+
+        var prompt =  "<p>What is the object in the <span style='color:blue'>blue border</span> called?<p>"
+
+         foils.push(target)
+
+         var to_return = _.shuffle(foils).join('') + prompt;
+
+         return to_return;
+       },
+       choices: [jsPsych.timelineVariable('choice1'), jsPsych.timelineVariable('choice2')],
+
+     };
+
+     var study_block = {
+       timeline: [study, fixation],
+       timeline_variables: semantic_stimuli,
+       randomize_order: true,
+     };
+
+      // timeline.push(study_block);
+
+     var production_block = {
+       timeline: [production, fixation],
+       timeline_variables: semantic_stimuli,
+       randomize_order: true,
+     };
+
+     // timeline.push(production_block);
+
+
+    var multi_comp_block = {
+      timeline: [multi_comprehension_trial],
+      timeline_variables: multi_comp_stimuli,
+      randomize_order: true,
+    };
+
+     timeline.push(multi_comp_block);
+
+
+    jsPsych.run(timeline);
+
+  </script>
+</html>
