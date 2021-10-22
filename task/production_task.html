@@ -107,7 +107,7 @@
        randomize_order: true,
      };
 
-      // timeline.push(study_block);
+
 
      var production_block = {
        timeline: [production, fixation],
@@ -115,7 +115,6 @@
        randomize_order: true,
      };
 
-     // timeline.push(production_block);
 
 
     var multi_comp_block = {
@@ -124,7 +123,9 @@
       randomize_order: true,
     };
 
+     timeline.push(study_block);
      timeline.push(multi_comp_block);
+     timeline.push(production_block);
 
 
     jsPsych.run(timeline);
