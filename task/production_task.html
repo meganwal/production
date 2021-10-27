@@ -40,15 +40,34 @@
        { stimulus: "img/bird6.png", correct_response: 'bosa'}
      ];
 
+     var comp_stimuli = [
+       {target: "img/bird1.png", choice1: 'tust', choice2: 'poom', target_word: 'tust'},
+       {target: "img/bird2.png", choice1: 'hux', choice2: 'poom', target_word: 'poom'},
+       {target: "img/bird3.png",choice1: 'hux', choice2: 'bosa', target_word: 'hux'},
+       {target: "img/bird4.png", choice1: 'tust', choice2: 'wilp', target_word: 'wilp'},
+       {target: "img/bird5.png", choice1: 'reng', choice2: 'wilp', target_word: 'reng'},
+       {target: "img/bird6.png", choice1: 'bosa', choice2: 'hux', target_word: 'bosa'}
+      ];
+
      var multi_comp_stimuli = [
         {target: "img/bird1.png", foils: ["img/bird2.png", "img/bird3.png", "img/bird4.png", "img/bird5.png", "img/bird6.png"],
-        choice1: 'tust', choice2: 'poom', target_word: 'tust'}
+        choice1: 'tust', choice2: 'poom', target_word: 'tust'},
+        {target: "img/bird2.png", foils: ["img/bird1.png", "img/bird3.png", "img/bird4.png", "img/bird5.png", "img/bird6.png"],
+        choice1: 'hux', choice2: 'poom', target_word: 'poom'},
+        {target: "img/bird3.png", foils: ["img/bird1.png", "img/bird2.png", "img/bird4.png", "img/bird5.png", "img/bird6.png"],
+        choice1: 'hux', choice2: 'bosa', target_word: 'hux'},
+        {target: "img/bird4.png", foils: ["img/bird1.png", "img/bird2.png", "img/bird3.png", "img/bird5.png", "img/bird6.png"],
+        choice1: 'tust', choice2: 'wilp', target_word: 'wilp'},
+        {target: "img/bird5.png", foils: ["img/bird1.png", "img/bird2.png", "img/bird3.png", "img/bird4.png", "img/bird6.png"],
+        choice1: 'reng', choice2: 'wilp', target_word: 'reng'},
+        {target: "img/bird6.png", foils: ["img/bird1.png", "img/bird2.png", "img/bird3.png", "img/bird4.png", "img/bird5.png"],
+        choice1: 'bosa', choice2: 'hux', target_word: 'bosa'}
       ];
 
      var study = {
        type: jsPsychHtmlKeyboardResponse,
        stimulus: function() {
-         var image = "<img style='height:400px;' src='" + jsPsych.timelineVariable('stimulus', true) +
+         var image = "<img style='height:200px;' src='" + jsPsych.timelineVariable('stimulus', true) +
          "'>"
          var text = "<p>This is a <strong>" + jsPsych.timelineVariable('correct_response', true) + "</strong></p>"
          return image + text
@@ -60,7 +79,7 @@
      var production = {
       type: jsPsychSurveyText,
       preamble: function() {
-        var target = "<img style='height:400px;' src='" + jsPsych.timelineVariable('stimulus', true) +
+        var target = "<img style='height:200px;' src='" + jsPsych.timelineVariable('stimulus', true) +
         "'>"
         return target;
       },
@@ -101,13 +120,23 @@
 
      };
 
+     var comprehension_trial = {
+       type: jsPsychHtmlButtonResponse,
+       stimulus: function() {
+         var target = "<img style='height:200px;' src='" + jsPsych.timelineVariable('target', true) +
+         "'>"
+         var prompt = "<p>What is this object called?<p>"
+         return target + prompt;
+       },
+       choices: [ jsPsych.timelineVariable('choice1'), jsPsych.timelineVariable('choice2')
+       ],
+     }
+
      var study_block = {
        timeline: [study, fixation],
        timeline_variables: semantic_stimuli,
        randomize_order: true,
      };
-
-
 
      var production_block = {
        timeline: [production, fixation],
@@ -115,17 +144,23 @@
        randomize_order: true,
      };
 
-
-
     var multi_comp_block = {
-      timeline: [multi_comprehension_trial],
+      timeline: [multi_comprehension_trial, fixation],
       timeline_variables: multi_comp_stimuli,
+      randomize_order: true,
+    };
+
+    var comp_block = {
+      timeline: [comprehension_trial, fixation],
+      timeline_variables: comp_stimuli,
       randomize_order: true,
     };
 
      timeline.push(study_block);
      timeline.push(multi_comp_block);
      timeline.push(production_block);
+     timeline.push(comp_block);
+     timeline.push(comp_block);
 
 
     jsPsych.run(timeline);
