@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>My experiment</title>
+        <script src="jspsych-6.3.1/jspsych.js"></script>
+        <script src="jspsych-6.3.1/jspsych.js"></script>
+        <script src="jspsych-6.3.1/modified_plugins/jspsych-html-keyboard-response-modified.js"></script>
+        <script src="jspsych-6.3.1/modified_plugins/jspsych-html-audio-response-plugin-modified.js"></script>
+        <script src="jspsych-6.3.1/modified_plugins/jspsych-audio-button-response-headphones_check_lite.js"></script>
+        <script src="jspsych-6.3.1/plugins/jspsych-html-keyboard-response.js"></script>
+        <script src="jspsych-6.3.1/plugins/jspsych-preload.js"></script>
+        <link href="jspsych-6.3.1/css/jspsych.css" rel="stylesheet" type="text/css">
+    </head>
+    <body></body>
+    <script>
+//how do I load in modified plugins/where to save?
+
+    var timeline = [];
+
+    var preload = {
+      type: 'preload',
+      images: ['img/bird1.png', 'img/bird2.png', 'img/bird3.png', 'img/bird4.png',
+       'img/bird5.png', 'img/bird6.png']
+    };
+
+    var semantic_stimuli = [
+       { stimulus: "img/bird1.png", correct_response: 'tust'},
+       { stimulus: "img/bird2.png", correct_response: 'poom'},
+       { stimulus: "img/bird3.png", correct_response: 'hux'},
+       { stimulus: "img/bird4.png", correct_response: 'wilp'},
+       { stimulus: "img/bird5.png", correct_response: 'reng'},
+       { stimulus: "img/bird6.png", correct_response: 'bosa'}
+     ];
+
+     var study = {
+       type: "html-keyboard-response-modified",
+       stimulus: function() {
+         var image = "<img style='height:200px;' src='" + jsPsych.timelineVariable('stimulus', true) +
+         "'>"
+         //instead of this want audio
+         var text = "<p>This is a <strong>" + jsPsych.timelineVariable('correct_response', true) + "</strong></p>"
+         return image + text
+       },
+       choices: jsPsych.NO_KEYS,
+       trial_duration: 3000,
+     };
+
+     var fixation = {
+        type: 'html-keyboard-response',
+        stimulus: '<div style="font-size:60px;">+</div>',
+        choices: jsPsych.NO_KEYS,
+        trial_duration: 2000
+        }
+
+     var study_block = {
+       timeline: [study,fixation],
+       timeline_variables: semantic_stimuli,
+       randomize_order: true,
+     };
+
+     timeline.push(study_block);
+
+     // Study Training trial: ?
+
+     // Comprehension Training trial: use
+     //jspsych-audio-button-response-headphones_check_lite.js (change image source in plugin)
+
+     // Production Training trial: ?
+
+     // Production Test trial: jspsych-html-audio-response.js
+     //(add audio lines described above, and change 'webm' to 'flac')
+
+     //Comprehension test: image-button-response AND copy and paste audio lines
+     //(in jspsych-html-audio-response-experiment.js: line 208 and lines 439-479)
+
+     jsPsych.init({
+       timeline: timeline
+     });
+
+    </script>
+</html>
