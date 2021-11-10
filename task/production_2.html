@@ -4,7 +4,7 @@
         <title>My experiment</title>
         <script src="jspsych-6.3.1/jspsych.js"></script>
         <script src="jspsych-6.3.1/jspsych.js"></script>
-        <script src="jspsych-6.3.1/modified_plugins/jspsych-html-keyboard-response-modified.js"></script>
+        <script src="jspsych-6.3.1/modified_plugins/jspsych-html-audio-keyboard-response.js"></script>
         <script src="jspsych-6.3.1/modified_plugins/jspsych-html-audio-response-plugin-modified.js"></script>
         <script src="jspsych-6.3.1/modified_plugins/jspsych-audio-button-response-headphones_check_lite.js"></script>
         <script src="jspsych-6.3.1/plugins/jspsych-html-keyboard-response.js"></script>
@@ -24,26 +24,38 @@
     };
 
     var semantic_stimuli = [
-       { stimulus: "img/bird1.png", correct_response: 'tust'},
-       { stimulus: "img/bird2.png", correct_response: 'poom'},
-       { stimulus: "img/bird3.png", correct_response: 'hux'},
-       { stimulus: "img/bird4.png", correct_response: 'wilp'},
-       { stimulus: "img/bird5.png", correct_response: 'reng'},
-       { stimulus: "img/bird6.png", correct_response: 'bosa'}
+       { stimulus: "img/bird1.png", correct_response: 'tust',
+       audio: "audio/Tust.mp3"},
+       { stimulus: "img/bird2.png", correct_response: 'poom',
+       audio: "audio/Poom.mp3"},
+       { stimulus: "img/bird3.png", correct_response: 'hux',
+       audio: "audio/Hux.mp3"},
+       { stimulus: "img/bird4.png", correct_response: 'wilp',
+       audio: "audio/Wilp.mp3"},
+       { stimulus: "img/bird5.png", correct_response: 'reng',
+     audio: "audio/Reng.mp3"},
+       { stimulus: "img/bird6.png", correct_response: 'bosa',
+       audio: "audio/Bosa.mp3"}
      ];
 
      var study = {
-       type: "html-keyboard-response-modified",
+       type: "html-audio-keyboard-response",
        stimulus: function() {
          var image = "<img style='height:200px;' src='" + jsPsych.timelineVariable('stimulus', true) +
          "'>"
          //instead of this want audio
-         var text = "<p>This is a <strong>" + jsPsych.timelineVariable('correct_response', true) + "</strong></p>"
-         return image + text
+         return image
        },
+       audio: jsPsych.timelineVariable('audio'),
        choices: jsPsych.NO_KEYS,
        trial_duration: 3000,
      };
+
+     var welcome = {
+       type: "html-keyboard-response",
+       stimulus: "Welcome to the experiment. Press any key to begin."
+     };
+    timeline.push(welcome);
 
      var fixation = {
         type: 'html-keyboard-response',
