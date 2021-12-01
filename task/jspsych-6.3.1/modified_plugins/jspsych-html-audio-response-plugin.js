@@ -45,7 +45,7 @@ jsPsych.plugins["html-audio-response"] = (function() {
                         const readerPromise = new Promise(function(resolveReader) {
                             reader.onloadend = function() {
                                 // Create base64 string, which is used to save the audio data in JSON/CSV format.
-                                // This has to go inside of a Promise so that the base64 data is converted before the 
+                                // This has to go inside of a Promise so that the base64 data is converted before the
                                 // higher-level data processing Promise is resolved (since that will pass the base64
                                 // data to the onRecordingFinish function).
                                 var base64 = reader.result;
@@ -54,7 +54,7 @@ jsPsych.plugins["html-audio-response"] = (function() {
                             };
                         });
                         readerPromise.then(function(base64) {
-                            // After the base64 string has been created we can resolve the higher-level Promise, 
+                            // After the base64 string has been created we can resolve the higher-level Promise,
                             // which pass both the base64 data and the URL to the onRecordingFinish function.
                             var processed_data = {url: url, str: base64};
                             resolve(processed_data);
@@ -159,6 +159,50 @@ jsPsych.plugins["html-audio-response"] = (function() {
 
     plugin.trial = function(display_element, trial) {
 
+      // RESEARCHER EDIT: Added function 'playClickOn'
+      // When called, this function waits 100ms, then plays the audio file 'click.mp3' which contains the phrase "Click on the..."
+      // This is called at the start of every trial using this plugin.
+      function playSound() {
+
+          var context = jsPsych.pluginAPI.audioContext();
+
+          var startTime;
+
+          // load audio file
+          var audio;
+
+          jsPsych.pluginAPI.getAudioBuffer('audio/WhatIsThisCalled.mp3')
+            .then(function (buffer) {
+              if (context !== null) {
+                audio = context.createBufferSource();
+                audio.buffer = buffer;
+                audio.connect(context.destination);
+              } else {
+                audio = buffer;
+                audio.currentTime = 0;
+              }
+
+              // start time
+              startTime = performance.now();
+
+              // start audio in audio context
+              if (context !== null) {
+                  startTime = context.currentTime;
+
+                  // play audio after 1 second
+                  audio.start(startTime + 1);
+              }
+              // or, start audio using js player
+              else {
+                  let playAudio = function() {
+                      audio.play();
+                  }
+
+                  // play audio after 1000ms
+                  setTimeout(playAudio,0);
+              }
+          });
+
         if(typeof trial.stimulus === 'undefined'){
             console.error('Required parameter "stimulus" missing in html-audio-response');
         }
@@ -174,6 +218,9 @@ jsPsych.plugins["html-audio-response"] = (function() {
 
         // add stimulus
         let html = '<div id="jspsych-html-audio-response-stimulus">'+trial.stimulus+'</div>';
+
+        //play audio
+        playSound();
 
         // add prompt if there is one
         if (trial.prompt !== null) {
@@ -221,7 +268,7 @@ jsPsych.plugins["html-audio-response"] = (function() {
                 document.querySelector('#jspsych-html-audio-response-recording-container').innerHTML = trial.recording_light;
             }
         }
-        
+
         // function to handle responses by the subject
         function process_audio(stream) {
 
@@ -231,7 +278,7 @@ jsPsych.plugins["html-audio-response"] = (function() {
                 } else {
                     document.querySelector('#jspsych-html-audio-response-recording-container').innerHTML = trial.recording_light;
                 }
-            } 
+            }
 
             // This code largely thanks to skyllo at
             // http://air.ghost.io/recording-to-an-audio-file-using-html5-and-js/
@@ -284,11 +331,11 @@ jsPsych.plugins["html-audio-response"] = (function() {
                         onRecordingFinish(chunks);
                     }
                     }
-                }; 
+                };
 
                 // start recording with 1 second time between receiving 'ondataavailable' events
                 recorder.start(1000);
-                
+
                 if(trial.manually_end_recording == false){
                     // setTimeout to stop recording after 4 seconds
                     setTimeout(function() {
@@ -312,7 +359,7 @@ jsPsych.plugins["html-audio-response"] = (function() {
                 errorQuit(wrong_browser_message);
             };
         }
-                   
+
            // navigator.mediaDevices.getUserMedia({audio:true});
             //recorder = new MediaRecorder(stream);
             //recorder.data = [];
@@ -375,8 +422,8 @@ jsPsych.plugins["html-audio-response"] = (function() {
                 end_trial();
             } else if (trial.allow_playback) {  // only allow playback if response doesn't end trial
                 showPlaybackTools(response.audio_url);
-            } else { 
-                // fallback in case response_ends_trial and allow_playback are both false, 
+            } else {
+                // fallback in case response_ends_trial and allow_playback are both false,
                 // which would mean the trial never ends
                 end_trial();
             }
@@ -409,7 +456,7 @@ jsPsych.plugins["html-audio-response"] = (function() {
             } else {
                 start_trial();
             }
-
+}
     };
 
     return plugin;

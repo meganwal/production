@@ -8,12 +8,12 @@
  *
  **/
 
-jsPsych.plugins["html-button-response"] = (function() {
+jsPsych.plugins["html-audio-button-response"] = (function() {
 
   var plugin = {};
 
   plugin.info = {
-    name: 'html-button-response',
+    name: 'html-audio-button-response',
     description: '',
     parameters: {
       stimulus: {
@@ -76,9 +76,51 @@ jsPsych.plugins["html-button-response"] = (function() {
   }
 
   plugin.trial = function(display_element, trial) {
+    function playSound() {
+
+        var context = jsPsych.pluginAPI.audioContext();
+
+        var startTime;
+
+        // load audio file
+        var audio;
+
+        jsPsych.pluginAPI.getAudioBuffer(trial.audio)
+          .then(function (buffer) {
+            if (context !== null) {
+              audio = context.createBufferSource();
+              audio.buffer = buffer;
+              audio.connect(context.destination);
+            } else {
+              audio = buffer;
+              audio.currentTime = 0;
+            }
+
+            // start time
+            startTime = performance.now();
+
+            // start audio in audio context
+            if (context !== null) {
+                startTime = context.currentTime;
+
+                // play audio after 1 second
+                audio.start(startTime + 1);
+            }
+            // or, start audio using js player
+            else {
+                let playAudio = function() {
+                    audio.play();
+                }
+
+                // play audio after 1000ms
+                setTimeout(playAudio,1000);
+            }
+        });
+    }
 
     // display stimulus
     var html = '<div id="jspsych-html-button-response-stimulus">'+trial.stimulus+'</div>';
+    playSound()
 
     //display buttons
     var buttons = [];

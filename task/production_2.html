@@ -5,15 +5,16 @@
         <script src="jspsych-6.3.1/jspsych.js"></script>
         <script src="jspsych-6.3.1/jspsych.js"></script>
         <script src="jspsych-6.3.1/modified_plugins/jspsych-html-audio-keyboard-response.js"></script>
-        <script src="jspsych-6.3.1/modified_plugins/jspsych-html-audio-response-plugin-modified.js"></script>
+        <script src="jspsych-6.3.1/modified_plugins/jspsych-html-audio-button-response.js"></script>
+        <script src="jspsych-6.3.1/modified_plugins/jspsych-html-audio-response-plugin.js"></script>
         <script src="jspsych-6.3.1/modified_plugins/jspsych-audio-button-response-headphones_check_lite.js"></script>
         <script src="jspsych-6.3.1/plugins/jspsych-html-keyboard-response.js"></script>
         <script src="jspsych-6.3.1/plugins/jspsych-preload.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
         <link href="jspsych-6.3.1/css/jspsych.css" rel="stylesheet" type="text/css">
     </head>
     <body></body>
     <script>
-//how do I load in modified plugins/where to save?
 
     var timeline = [];
 
@@ -23,20 +24,50 @@
        'img/bird5.png', 'img/bird6.png']
     };
 
-    var semantic_stimuli = [
+    var semantic_stimuli_study = [
        { stimulus: "img/bird1.png", correct_response: 'tust',
-       audio: "audio/Tust.mp3"},
+       audio: "audio/ThisIsTust.flac"},
        { stimulus: "img/bird2.png", correct_response: 'poom',
-       audio: "audio/Poom.mp3"},
+       audio: "audio/ThisIsPoom.flac"},
        { stimulus: "img/bird3.png", correct_response: 'hux',
-       audio: "audio/Hux.mp3"},
+       audio: "audio/ThisIsHux.flac"},
        { stimulus: "img/bird4.png", correct_response: 'wilp',
-       audio: "audio/Wilp.mp3"},
+       audio: "audio/ThisIsWilp.flac"},
        { stimulus: "img/bird5.png", correct_response: 'reng',
-     audio: "audio/Reng.mp3"},
+     audio: "audio/ThisIsReng.flac"},
        { stimulus: "img/bird6.png", correct_response: 'bosa',
-       audio: "audio/Bosa.mp3"}
+       audio: "audio/ThisIsBosa.flac"}
      ];
+
+     var semantic_stimuli_comptest = [
+        { stimulus: "img/bird1.png", correct_response: 'tust',
+        audio: "audio/IsThisHux.flac"},
+        { stimulus: "img/bird2.png", correct_response: 'poom',
+        audio: "audio/IsThisPoom.flac"},
+        { stimulus: "img/bird3.png", correct_response: 'hux',
+        audio: "audio/IsThisTust.flac"},
+        { stimulus: "img/bird4.png", correct_response: 'wilp',
+        audio: "audio/IsThisWilp.flac"},
+        { stimulus: "img/bird5.png", correct_response: 'reng',
+      audio: "audio/IsThisReng.flac"},
+        { stimulus: "img/bird6.png", correct_response: 'bosa',
+        audio: "audio/IsThisBosa.flac"}
+      ];
+
+      var semantic_stimuli_comptrial = [
+         {target: "img/bird1.png", foils: ["img/bird2.png", "img/bird3.png", "img/bird4.png", "img/bird5.png", "img/bird6.png"],
+         audio: "audio/PoomTust.flac", target_word: 'tust'},
+         {target: "img/bird2.png", foils: ["img/bird1.png", "img/bird3.png", "img/bird4.png", "img/bird5.png", "img/bird6.png"],
+         audio: "audio/RengPoom.flac", target_word: 'poom'},
+         {target: "img/bird3.png", foils: ["img/bird1.png", "img/bird2.png", "img/bird4.png", "img/bird5.png", "img/bird6.png"],
+         audio: "audio/HuxTust.flac", target_word: 'hux'},
+         {target: "img/bird4.png", foils: ["img/bird1.png", "img/bird2.png", "img/bird3.png", "img/bird5.png", "img/bird6.png"],
+         audio: "audio/BosaWilp.flac", target_word: 'wilp'},
+         {target: "img/bird5.png", foils: ["img/bird1.png", "img/bird2.png", "img/bird3.png", "img/bird4.png", "img/bird6.png"],
+         audio: "audio/WilpReng.flac", target_word: 'reng'},
+         {target: "img/bird6.png", foils: ["img/bird1.png", "img/bird2.png", "img/bird3.png", "img/bird4.png", "img/bird5.png"],
+         audio: "audio/BosaHux.flac", target_word: 'bosa'}
+       ];
 
      var study = {
        type: "html-audio-keyboard-response",
@@ -47,7 +78,8 @@
          return image
        },
        audio: jsPsych.timelineVariable('audio'),
-       choices: jsPsych.NO_KEYS,
+       choices: ['f'], //actually want to make you progress after certain amount of time
+       prompt: 'press f to progress',
        trial_duration: 3000,
      };
 
@@ -66,7 +98,7 @@
 
      var study_block = {
        timeline: [study,fixation],
-       timeline_variables: semantic_stimuli,
+       timeline_variables: semantic_stimuli_study,
        randomize_order: true,
      };
 
@@ -74,16 +106,89 @@
 
      // Study Training trial: ?
 
-     // Comprehension Training trial: use
-     //jspsych-audio-button-response-headphones_check_lite.js (change image source in plugin)
+     // Comprehension Training trial:
+
+     var multi_comprehension_trial = {
+       type: 'html-audio-keyboard-response',
+       stimulus: function(){
+         var target = ("<img style='border: 10px solid blue; margin: 50px'" +
+         "src='" + jsPsych.timelineVariable('target', true) +
+         "' height='200px'>");
+
+         function make_foil(img) {
+           return "<img style='margin: 50px' src='" + img +  "' height='200px'>"
+         }
+
+        var foils = _.map(jsPsych.timelineVariable('foils', true), make_foil)
+
+        var prompt =  "f = first word, j = second word"
+
+         foils.push(target)
+
+         var to_return = _.shuffle(foils).join('') + prompt;
+
+         return to_return;
+       },
+       choices: ['f', 'j'],
+       audio: jsPsych.timelineVariable('audio')
+
+     };
+
+     var multi_comp_block = {
+       timeline: [multi_comprehension_trial, fixation],
+       timeline_variables: semantic_stimuli_comptrial,
+       randomize_order: true,
+     };
+
+    timeline.push(multi_comp_block);
 
      // Production Training trial: ?
 
      // Production Test trial: jspsych-html-audio-response.js
      //(add audio lines described above, and change 'webm' to 'flac')
 
-     //Comprehension test: image-button-response AND copy and paste audio lines
-     //(in jspsych-html-audio-response-experiment.js: line 208 and lines 439-479)
+     var production = {
+       type: "html-audio-keyboard-response",
+       stimulus: function() {
+         var image = "<img style='height:200px;' src='" + jsPsych.timelineVariable('stimulus', true) +
+         "'>"
+         return image
+       },
+       audio: "audio/WhatIs.flac",
+       choices: jsPsych.NO_KEYS,
+       trial_duration: 3000,
+     };
+
+     var production_block = {
+      timeline: [production, fixation],
+      timeline_variables: semantic_stimuli_study,
+      randomize_order: true,
+     };
+
+     timeline.push(production_block)
+
+     //Comprehension test:
+
+     var comprehension_test = {
+        type: "html-audio-button-response",
+        stimulus: function() {
+          var image = "<img style='height:200px;' src='" + jsPsych.timelineVariable('stimulus', true) +
+          "'>"
+          return image
+        },
+        audio: jsPsych.timelineVariable('audio'),
+        choices: ['yes', 'no']
+      };
+
+      var comp_test_block = {
+        timeline: [comprehension_test, fixation],
+        timeline_variables: semantic_stimuli_comptest,
+        randomize_order: true,
+      };
+
+      timeline.push(comp_test_block);
+      timeline.push(comp_test_block);
+
 
      jsPsych.init({
        timeline: timeline
