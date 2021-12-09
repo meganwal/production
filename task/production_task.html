@@ -2,13 +2,16 @@
 <html>
   <head>
     <title>Production Task</title>
-    <script src="https://unpkg.com/jspsych@7.0.0"></script>
+    <script src="https://unpkg.com/jspsych@7.1.2"></script>
     <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.0.0"></script>
     <script src="https://unpkg.com/@jspsych/plugin-html-button-response@1.0.0"></script>
     <script src="https://unpkg.com/@jspsych/plugin-image-button-response@1.0.0"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-audio-keyboard-response@1.0.0"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-html-audio-response@1.0.0"></script>
     <script src="https://unpkg.com/@jspsych/plugin-preload@1.0.0"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-initialize-microphone@1.0.0"></script>
     <script src="https://unpkg.com/@jspsych/plugin-survey-text@1.0.0"></script>
-    <link href="https://unpkg.com/jspsych@7.0.0/css/jspsych.css" rel="stylesheet" type="text/css" />
+    <link href="https://unpkg.com/jspsych@7.1.2/css/jspsych.css" rel="stylesheet" type="text/css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
   </head>
   <body></body>
@@ -31,13 +34,24 @@
     timeline.push(welcome);
 
 
-    var semantic_stimuli = [
-       { stimulus: "img/bird1.png", correct_response: 'tust'},
-       { stimulus: "img/bird2.png", correct_response: 'poom'},
-       { stimulus: "img/bird3.png", correct_response: 'hux'},
-       { stimulus: "img/bird4.png", correct_response: 'wilp'},
-       { stimulus: "img/bird5.png", correct_response: 'reng'},
-       { stimulus: "img/bird6.png", correct_response: 'bosa'}
+    var initmicrophone = {
+      type: jsPsychInitializeMicrophone
+    }
+    timeline.push(initmicrophone)
+
+    var semantic_stimuli_study = [
+       { stimulus: "img/bird1.png", correct_response: 'tust',
+       audio: "audio/ThisIsTust.flac"},
+       { stimulus: "img/bird2.png", correct_response: 'poom',
+       audio: "audio/ThisIsPoom.flac"},
+       { stimulus: "img/bird3.png", correct_response: 'hux',
+       audio: "audio/ThisIsHux.flac"},
+       { stimulus: "img/bird4.png", correct_response: 'wilp',
+       audio: "audio/ThisIsWilp.flac"},
+       { stimulus: "img/bird5.png", correct_response: 'reng',
+     audio: "audio/ThisIsReng.flac"},
+       { stimulus: "img/bird6.png", correct_response: 'bosa',
+       audio: "audio/ThisIsBosa.flac"}
      ];
 
      var comp_stimuli = [
@@ -65,27 +79,26 @@
       ];
 
      var study = {
-       type: jsPsychHtmlKeyboardResponse,
-       stimulus: function() {
+       type: jsPsychAudioKeyboardResponse,
+       stimulus: jsPsych.timelineVariable('audio'),
+       prompt: function() {
          var image = "<img style='height:200px;' src='" + jsPsych.timelineVariable('stimulus', true) +
          "'>"
-         var text = "<p>This is a <strong>" + jsPsych.timelineVariable('correct_response', true) + "</strong></p>"
-         return image + text
+         return image
        },
        choices: "NO_KEYS",
        trial_duration: 3000,
      };
 
      var production = {
-      type: jsPsychSurveyText,
-      preamble: function() {
+      type: jsPsychHtmlAudioResponse,
+      stimulus: function() {
         var target = "<img style='height:200px;' src='" + jsPsych.timelineVariable('stimulus', true) +
         "'>"
+        var text = "speak the name of the image aloud"
         return target;
+        recording_duration: 100000
       },
-      questions: [
-        {prompt: 'What is this called?', rows:1}
-      ],
     };
 
      var fixation = {
@@ -134,13 +147,13 @@
 
      var study_block = {
        timeline: [study, fixation],
-       timeline_variables: semantic_stimuli,
+       timeline_variables: semantic_stimuli_study,
        randomize_order: true,
      };
 
      var production_block = {
        timeline: [production, fixation],
-       timeline_variables: semantic_stimuli,
+       timeline_variables: semantic_stimuli_study,
        randomize_order: true,
      };
 
@@ -156,11 +169,11 @@
       randomize_order: true,
     };
 
-     timeline.push(study_block);
-     timeline.push(multi_comp_block);
+     //timeline.push(study_block);
      timeline.push(production_block);
-     timeline.push(comp_block);
-     timeline.push(comp_block);
+     //timeline.push(multi_comp_block);
+     //timeline.push(comp_block);
+     //timeline.push(comp_block);
 
 
     jsPsych.run(timeline);
