@@ -20,69 +20,94 @@
 
      var timeline = [];
 
+//preload images
      var preload = {
        type: jsPsychPreload,
        images: ['img/bird1.png', 'img/bird2.png', 'img/bird3.png', 'img/bird4.png',
-        'img/bird5.png', 'img/bird6.png']
+        'img/bird5.png', 'img/bird6.png', 'img/bird7.png', 'img/bird8.png',
+        'img/bird9.png'],
+        audio: ["audio/ThisTust.flac", "audio/ClickTust.flac",
+         "audio/ThisFroom.flac", "audio/ClickFroom.flac", "audio/ThisDarg.flac",
+         "audio/ClickDarg.flac", "audio/ThisWilp.flac", "audio/ClickWilp.flac",
+         "audio/ThisReng.flac", "audio/ClickReng.flac", "audio/ThisBosa.flac",
+        "audio/ClickBosa.flac", "audio/ThisKel.flac", "audio/ClickKel.flac",
+        "audio/ThisLav.flac", "audio/ClickLav.flac", "audio/ThisNoz.flac",
+        "audio/ClickNoz.flac"]
      };
+
      timeline.push(preload);
 
+//intro screen
      var welcome = {
        type: jsPsychHtmlKeyboardResponse,
        stimulus: "Welcome to the experiment. Press any key to begin."
      };
     timeline.push(welcome);
 
-
+//microphone permissions
     var initmicrophone = {
       type: jsPsychInitializeMicrophone
     }
-    timeline.push(initmicrophone)
+    //timeline.push(initmicrophone)
 
-    var semantic_stimuli_study = [
-       { stimulus: "img/bird1.png", correct_response: 'tust',
-       audio: "audio/ThisIsTust.flac"},
-       { stimulus: "img/bird2.png", correct_response: 'poom',
-       audio: "audio/ThisIsPoom.flac"},
-       { stimulus: "img/bird3.png", correct_response: 'hux',
-       audio: "audio/ThisIsHux.flac"},
-       { stimulus: "img/bird4.png", correct_response: 'wilp',
-       audio: "audio/ThisIsWilp.flac"},
-       { stimulus: "img/bird5.png", correct_response: 'reng',
-     audio: "audio/ThisIsReng.flac"},
-       { stimulus: "img/bird6.png", correct_response: 'bosa',
-       audio: "audio/ThisIsBosa.flac"}
-     ];
+//select block stimuli
+  //var sem_neither_words = "Kel", "Lav","Froom","Tust","Bosa","Darg","Noz","Reng",
+        //"Wilp", "Nax", "Vang", "Bip", "Jick", "Terb", "Krat", "Raf", "Lop, Gree"],
+//  var phon_words = ["Hisp", "Poss", "Pess", "Hoss", "Pux", "Hap", "Pist", "Hust"
+        //  "Hass"],
+  //var sem_image_categories = ["bird", "animal", "insect", "flower"],
+//  var block_types = ["sem", "phon", "neither"],
+//  var conditions = ["study", "comprehension", "production"],
 
+
+
+//hard-coded semantic images and foils with audio files --  need to randomize
      var comp_stimuli = [
-       {target: "img/bird1.png", choice1: 'tust', choice2: 'poom', target_word: 'tust'},
-       {target: "img/bird2.png", choice1: 'hux', choice2: 'poom', target_word: 'poom'},
-       {target: "img/bird3.png",choice1: 'hux', choice2: 'bosa', target_word: 'hux'},
-       {target: "img/bird4.png", choice1: 'tust', choice2: 'wilp', target_word: 'wilp'},
-       {target: "img/bird5.png", choice1: 'reng', choice2: 'wilp', target_word: 'reng'},
-       {target: "img/bird6.png", choice1: 'bosa', choice2: 'hux', target_word: 'bosa'}
+        {target: "img/bird1.png", foils: ["img/bird2.png", "img/bird3.png",
+        "img/bird4.png", "img/bird5.png", "img/bird6.png", "img/bird7.png",
+        "img/bird8.png", "img/bird9.png"], study_audio: "audio/ThisTust.flac",
+        comp_audio:"audio/ClickTust.flac"},
+        {target: "img/bird2.png", foils: ["img/bird1.png", "img/bird3.png",
+        "img/bird4.png", "img/bird5.png", "img/bird6.png", "img/bird7.png",
+        "img/bird8.png", "img/bird9.png"], study_audio: "audio/ThisFroom.flac",
+        comp_audio:"audio/ClickFroom.flac"},
+        {target: "img/bird3.png", foils: ["img/bird1.png", "img/bird2.png",
+        "img/bird4.png", "img/bird5.png", "img/bird6.png", "img/bird7.png",
+        "img/bird8.png", "img/bird9.png"], study_audio: "audio/ThisDarg.flac",
+        comp_audio:"audio/ClickDarg.flac"},
+        {target: "img/bird4.png", foils: ["img/bird1.png", "img/bird2.png",
+        "img/bird3.png", "img/bird5.png", "img/bird6.png", 'img/bird7.png',
+        "img/bird8.png", "img/bird9.png"], study_audio: "audio/ThisWilp.flac",
+        comp_audio:"audio/ClickWilp.flac"},
+        {target: "img/bird5.png", foils: ["img/bird1.png", "img/bird2.png",
+        "img/bird3.png", "img/bird4.png", "img/bird6.png", "img/bird7.png",
+        "img/bird8.png", "img/bird9.png"], study_audio: "audio/ThisReng.flac",
+        comp_audio:"audio/ClickReng.flac"},
+        {target: "img/bird6.png", foils: ["img/bird1.png", "img/bird2.png",
+        "img/bird3.png", "img/bird4.png", "img/bird5.png", "img/bird7.png",
+        "img/bird8.png", "img/bird9.png"], study_audio: "audio/ThisBosa.flac",
+        comp_audio:"audio/ClickBosa.flac"},
+        {target: "img/bird7.png", foils: ["img/bird1.png", "img/bird2.png",
+        "img/bird3.png", "img/bird4.png", "img/bird5.png", "img/bird6.png",
+        "img/bird8.png", "img/bird9.png"], study_audio: "audio/ThisKel.flac",
+        comp_audio:"audio/ClickKel.flac"},
+        {target: "img/bird8.png", foils: ["img/bird1.png", "img/bird2.png",
+        "img/bird3.png", "img/bird4.png", "img/bird5.png", "img/bird6.png",
+        "img/bird7.png", "img/bird9.png"], study_audio: "audio/ThisLav.flac",
+        comp_audio:"audio/ClickLav.flac"},
+        {target: "img/bird9.png", foils: ["img/bird1.png", "img/bird2.png",
+        "img/bird3.png", "img/bird4.png", "img/bird5.png", "img/bird6.png",
+        "img/bird7.png", "img/bird8.png"], study_audio:"audio/ThisNoz.flac",
+        comp_audio: "audio/ClickNoz.flac"},
       ];
 
-     var multi_comp_stimuli = [
-        {target: "img/bird1.png", foils: ["img/bird2.png", "img/bird3.png", "img/bird4.png", "img/bird5.png", "img/bird6.png"],
-        choice1: 'tust', choice2: 'poom', target_word: 'tust'},
-        {target: "img/bird2.png", foils: ["img/bird1.png", "img/bird3.png", "img/bird4.png", "img/bird5.png", "img/bird6.png"],
-        choice1: 'hux', choice2: 'poom', target_word: 'poom'},
-        {target: "img/bird3.png", foils: ["img/bird1.png", "img/bird2.png", "img/bird4.png", "img/bird5.png", "img/bird6.png"],
-        choice1: 'hux', choice2: 'bosa', target_word: 'hux'},
-        {target: "img/bird4.png", foils: ["img/bird1.png", "img/bird2.png", "img/bird3.png", "img/bird5.png", "img/bird6.png"],
-        choice1: 'tust', choice2: 'wilp', target_word: 'wilp'},
-        {target: "img/bird5.png", foils: ["img/bird1.png", "img/bird2.png", "img/bird3.png", "img/bird4.png", "img/bird6.png"],
-        choice1: 'reng', choice2: 'wilp', target_word: 'reng'},
-        {target: "img/bird6.png", foils: ["img/bird1.png", "img/bird2.png", "img/bird3.png", "img/bird4.png", "img/bird5.png"],
-        choice1: 'bosa', choice2: 'hux', target_word: 'bosa'}
-      ];
-
+//study trial ("this is a xxx") -- need to make it so they progress
      var study = {
        type: jsPsychAudioKeyboardResponse,
-       stimulus: jsPsych.timelineVariable('audio'),
+       stimulus: jsPsych.timelineVariable('study_audio'),
        prompt: function() {
-         var image = "<img style='height:200px;' src='" + jsPsych.timelineVariable('stimulus', true) +
+         var image = "<img style='height:200px;' src='" +
+         jsPsych.timelineVariable('target', true) +
          "'>"
          return image
        },
@@ -90,17 +115,7 @@
        trial_duration: 3000,
      };
 
-     var production = {
-      type: jsPsychHtmlAudioResponse,
-      stimulus: function() {
-        var target = "<img style='height:200px;' src='" + jsPsych.timelineVariable('stimulus', true) +
-        "'>"
-        var text = "speak the name of the image aloud"
-        return target;
-        recording_duration: 100000
-      },
-    };
-
+// fixation cross
      var fixation = {
        type: jsPsychHtmlKeyboardResponse,
        stimulus: '<div style="font-size:60px;">+</div>',
@@ -108,73 +123,163 @@
        trial_duration: 1000,
      };
 
-     var multi_comprehension_trial = {
-       type: jsPsychHtmlButtonResponse,
-       stimulus: function(){
+  //study training trial
+     var study_training = {
+       type: jsPsychAudioKeyboardResponse,
+       stimulus: jsPsych.timelineVariable('study_audio'),
+       prompt: function(){
          var target = ("<img style='border: 10px solid blue; margin: 50px'" +
          "src='" + jsPsych.timelineVariable('target', true) +
          "' height='200px'>");
 
          function make_foil(img) {
-           return "<img style='margin: 50px' src='" + img +  "' height='200px'>"
+           return "<img style='='border: 10px solid white ; margin: 50px' src='" + img +  "' height='200px'>"
          }
 
         var foils = _.map(jsPsych.timelineVariable('foils', true), make_foil)
 
-        var prompt =  "<p>What is the object in the <span style='color:blue'>blue border</span> called?<p>"
 
          foils.push(target)
 
-         var to_return = _.shuffle(foils).join('') + prompt;
+         var to_return = _.shuffle(foils).join('');
 
          return to_return;
        },
-       choices: [jsPsych.timelineVariable('choice1'), jsPsych.timelineVariable('choice2')],
-
+       choices: "NO_KEYS",
+       trial_duration: 3000,
      };
 
+// comprehension trial -- need to change to click on
      var comprehension_trial = {
-       type: jsPsychHtmlButtonResponse,
-       stimulus: function() {
-         var target = "<img style='height:200px;' src='" + jsPsych.timelineVariable('target', true) +
-         "'>"
-         var prompt = "<p>What is this object called?<p>"
-         return target + prompt;
+       type: jsPsychAudioKeyboardResponse,
+       stimulus: jsPsych.timelineVariable('comp_audio'),
+       prompt: function(){
+         var target = ("<img style='border: 10px solid white; margin: 50px'" +
+         "src='" + jsPsych.timelineVariable('target', true) +
+         "' height='200px'>");
+
+         function make_foil(img) {
+           return "<img style='='border: 10px solid white ; margin: 50px' src='" + img +  "' height='200px'>"
+         }
+
+        var foils = _.map(jsPsych.timelineVariable('foils', true), make_foil)
+
+
+         foils.push(target)
+
+         var to_return = _.shuffle(foils).join('');
+
+         return to_return;
        },
-       choices: [ jsPsych.timelineVariable('choice1'), jsPsych.timelineVariable('choice2')
-       ],
-     }
+       choices: "NO_KEYS",
+       trial_duration: 8000,
 
-     var study_block = {
-       timeline: [study, fixation],
-       timeline_variables: semantic_stimuli_study,
-       randomize_order: true,
      };
 
-     var production_block = {
-       timeline: [production, fixation],
-       timeline_variables: semantic_stimuli_study,
-       randomize_order: true,
-     };
-
-    var multi_comp_block = {
-      timeline: [multi_comprehension_trial, fixation],
-      timeline_variables: multi_comp_stimuli,
-      randomize_order: true,
+ //production trial
+    var production = {
+      type: jsPsychHtmlAudioResponse,
+      stimulus: function() {
+        var target = "<img style='height:200px;' src='" +
+        jsPsych.timelineVariable('stimulus', true) +
+        "'>"
+        var text = "speak the name of the image aloud"
+        return target;
+        recording_duration: 100000
+      },
     };
 
-    var comp_block = {
+//semantic study block
+     var study_trials = {
+       timeline: [study, fixation],
+       timeline_variables: comp_stimuli,
+       randomize_order: true,
+     };
+
+//semantic study block
+    var study_training_trials = {
+          timeline: [study_training, fixation],
+          timeline_variables: comp_stimuli,
+          randomize_order: true,
+        };
+
+//semantic production block
+     var production_trials = {
+       timeline: [production, fixation],
+       timeline_variables: comp_stimuli,
+       randomize_order: true,
+     };
+
+//semantic comprehension block
+    var comp_test_trials = {
       timeline: [comprehension_trial, fixation],
       timeline_variables: comp_stimuli,
       randomize_order: true,
     };
 
-     //timeline.push(study_block);
-     timeline.push(production_block);
-     //timeline.push(multi_comp_block);
-     //timeline.push(comp_block);
-     //timeline.push(comp_block);
+     timeline.push(study_trials);
+     timeline.push(study_training_trials);
+     timeline.push(comp_test_trials);
+     //timeline.push(sem_production_block);
 
+     // randomization for final test trials
+         var trial_structure = function(){
+           var all_stims = []
+           var targets = [
+             {type: "sem", images: [1,2,3,4,5,6,7,8,9]},
+             {type: "neither", images: [10,11,12,13,14,15,16,17,18]},
+             {type: "phon", images: [19,20,21,22,23,24,25,26,27]}]
+
+           var original_foils = _.cloneDeep(targets)
+           var foils = _.cloneDeep(original_foils)
+
+           _.map(targets, function(o){o['images'] = _.shuffle(o['images'])})
+           _.map(foils, function(o){o['images'] = _.shuffle(o['images'])})
+
+           var types = ["sem", "neither", "phon"]
+
+           var this_type_array;
+           var this_target;
+           var this_foils = [];
+           var tmp_foils;
+           var tmp_foil_images;
+           var target_idx;
+
+           for (var i = 0; i < 9; i++) {
+             for(const this_type of types) {
+
+               this_type_array =  _.find(targets, ['type', this_type])
+               this_target = this_type_array['images'].splice(0,1)
+               this_foils = [];
+
+               for(const this_foil_type of types) {
+
+                 if(this_foil_type == this_type) {
+                   tmp_foils = _.find(foils, ['type', this_foil_type])
+                   tmp_foil_images = tmp_foils['images']
+                   target_idx = tmp_foil_images.findIndex((element) => element == this_target)
+
+                   if(target_idx == 0) {
+                     this_foils.push(tmp_foil_images.splice(1,2))
+                   } else if(target_idx == 1) {
+                     this_foils.push(tmp_foil_images.splice(0,1))
+                     this_foils.push(tmp_foil_images.splice(1,1))
+                   } else {
+                     this_foils.push(tmp_foil_images.splice(0,2))
+                   }
+
+                 } else {
+                   tmp_foils = _.find(foils, ['type', this_foil_type])
+                   this_foils.push(tmp_foils['images'].splice(0,3))
+                 }
+               }
+
+               all_stims.push({target:_.first(this_target), foils: _.flatten(this_foils)})
+             }
+             foils = _.cloneDeep(original_foils)
+           }
+           return all_stims
+         }
 
     jsPsych.run(timeline);
 

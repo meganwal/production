@@ -1,0 +1,30 @@
+.target {
+  border: 1vh solid blue;
+}
+
+.foil {
+  border: 1vh solid white;
+}
+
+.grid {
+  display: grid;
+  height: 85vh;
+  width: 85vh;
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.study_grid {
+  bottom: 8vh;
+  position: relative;
+}
+
+.study_btn {
+  top: 85vh;
+  position: relative;
+}
+
+.grid>* {
+  width: 100%;
+  height: auto;
+  box-sizing: border-box;
+}
