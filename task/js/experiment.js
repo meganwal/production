@@ -124,49 +124,6 @@
  var initmicrophone = {
    type: jsPsychInitializeMicrophone
  }
- //timeline.push(initmicrophone)
-
-
-
-//hard-coded semantic images and foils with audio files --  need to randomize
-  var comp_stimuli = [
-     {target: "img/bird1.png", foils: ["img/bird2.png", "img/bird3.png",
-     "img/bird4.png", "img/bird5.png", "img/bird6.png", "img/bird7.png",
-     "img/bird8.png", "img/bird9.png"], study_audio: "audio/ThisTust.flac",
-     comp_audio:"audio/ClickTust.flac"},
-     {target: "img/bird2.png", foils: ["img/bird1.png", "img/bird3.png",
-     "img/bird4.png", "img/bird5.png", "img/bird6.png", "img/bird7.png",
-     "img/bird8.png", "img/bird9.png"], study_audio: "audio/ThisFroom.flac",
-     comp_audio:"audio/ClickFroom.flac"},
-     {target: "img/bird3.png", foils: ["img/bird1.png", "img/bird2.png",
-     "img/bird4.png", "img/bird5.png", "img/bird6.png", "img/bird7.png",
-     "img/bird8.png", "img/bird9.png"], study_audio: "audio/ThisDarg.flac",
-     comp_audio:"audio/ClickDarg.flac"},
-     {target: "img/bird4.png", foils: ["img/bird1.png", "img/bird2.png",
-     "img/bird3.png", "img/bird5.png", "img/bird6.png", 'img/bird7.png',
-     "img/bird8.png", "img/bird9.png"], study_audio: "audio/ThisWilp.flac",
-     comp_audio:"audio/ClickWilp.flac"},
-     {target: "img/bird5.png", foils: ["img/bird1.png", "img/bird2.png",
-     "img/bird3.png", "img/bird4.png", "img/bird6.png", "img/bird7.png",
-     "img/bird8.png", "img/bird9.png"], study_audio: "audio/ThisReng.flac",
-     comp_audio:"audio/ClickReng.flac"},
-     {target: "img/bird6.png", foils: ["img/bird1.png", "img/bird2.png",
-     "img/bird3.png", "img/bird4.png", "img/bird5.png", "img/bird7.png",
-     "img/bird8.png", "img/bird9.png"], study_audio: "audio/ThisBosa.flac",
-     comp_audio:"audio/ClickBosa.flac"},
-     {target: "img/bird7.png", foils: ["img/bird1.png", "img/bird2.png",
-     "img/bird3.png", "img/bird4.png", "img/bird5.png", "img/bird6.png",
-     "img/bird8.png", "img/bird9.png"], study_audio: "audio/ThisKel.flac",
-     comp_audio:"audio/ClickKel.flac"},
-     {target: "img/bird8.png", foils: ["img/bird1.png", "img/bird2.png",
-     "img/bird3.png", "img/bird4.png", "img/bird5.png", "img/bird6.png",
-     "img/bird7.png", "img/bird9.png"], study_audio: "audio/ThisLav.flac",
-     comp_audio:"audio/ClickLav.flac"},
-     {target: "img/bird9.png", foils: ["img/bird1.png", "img/bird2.png",
-     "img/bird3.png", "img/bird4.png", "img/bird5.png", "img/bird6.png",
-     "img/bird7.png", "img/bird8.png"], study_audio:"audio/ThisNoz.flac",
-     comp_audio: "audio/ClickNoz.flac"},
-   ];
 
 var sem_index_list = [{index: 0, block: 'semantic'}, {index: 1, block: 'semantic'},{index:2, block: 'semantic'},{index:3, block: 'semantic'},{index:4, block: 'semantic'},{index:5, block: 'semantic'},
   {index:6, block: 'semantic'},{index:7, block: 'semantic'},{index:8, block: 'semantic'}]
@@ -181,21 +138,40 @@ var semantic_image_list = ["img/bird1.png", "img/bird2.png", "img/bird3.png",
 
 var semantic_word_list = ["Kel", "Lav","Froom","Tust","Bosa","Darg","Noz","Reng", "Wilp"]
 
-//study trial ("this is a xxx") -- need to make it so they progress
+//introduction trial -- need to get image size/button location adjusted
   var introduction = {
-    type: jsPsychAudioKeyboardResponse,
+    type: jsPsychAudioButtonResponse,
     stimulus: function(){
-      var word = word_list[jsPsych.timelineVariable('index')];
+      if (jsPsych.timelineVariable('block') == "semantic") {
+        word = semantic_word_list[jsPsych.timelineVariable('index')];
+      }
+      if (jsPsych.timelineVariable('block') == "phonological") {
+        word = phological_word_list[jsPsych.timelineVariable('index')];
+      }
+      if (jsPsych.timelineVariable('block') == "none") {
+        word = none_word_list[jsPsych.timelineVariable('index')];
+      }
       return "audio/This" + word + ".flac"
     },
     prompt: function() {
-      var image = "<img style='height:200px;' src='" +
-      jsPsych.timelineVariable('target', true) +
-      "'>"
-      return image
+      if (jsPsych.timelineVariable('block') == "semantic") {
+        image_list = semantic_image_list;
+      }
+      if (jsPsych.timelineVariable('block') == "phonological") {
+        image_list = phonological_image_list;
+      }
+      if (jsPsych.timelineVariable('block') == "none") {
+        image_list = none_image_list;
+      }
+      var target_image = image_list[jsPsych.timelineVariable('index')]
+      var html_target_image = "<img class = 'img' src = '" + target_image + "'>";
+      return html_target_image
     },
-    choices: "NO_KEYS",
-    trial_duration: 3000,
+    choices: ["Continue"],
+    button_html: `
+      <button class = "jspsych-btn study_btn">%choice%</button>
+    `,
+    response_allowed_while_playing: false,
   };
 
 // fixation cross
@@ -213,11 +189,23 @@ var semantic_word_list = ["Kel", "Lav","Froom","Tust","Bosa","Darg","Noz","Reng"
       if (jsPsych.timelineVariable('block') == "semantic") {
         word = semantic_word_list[jsPsych.timelineVariable('index')];
       }
+      if (jsPsych.timelineVariable('block') == "phonological") {
+        word = phological_word_list[jsPsych.timelineVariable('index')];
+      }
+      if (jsPsych.timelineVariable('block') == "none") {
+        word = none_word_list[jsPsych.timelineVariable('index')];
+      }
       return "audio/This" + word + ".flac"
     },
     prompt: function(){
       if (jsPsych.timelineVariable('block') == "semantic") {
         image_list = semantic_image_list;
+      }
+      if (jsPsych.timelineVariable('block') == "phonological") {
+        image_list = phonological_image_list;
+      }
+      if (jsPsych.timelineVariable('block') == "none") {
+        image_list = none_image_list;
       }
       var target_image = image_list[jsPsych.timelineVariable('index')];
       var html_target_image = "<img class = 'target' src = '" + target_image + "'>";
@@ -230,10 +218,9 @@ var semantic_word_list = ["Kel", "Lav","Froom","Tust","Bosa","Darg","Noz","Reng"
       }
       shuffle(html_image_list);
       var html_images_string = html_image_list.join("");
-      console.log(html_images_string)
       return "<div class = 'grid study_grid'>" + html_images_string + "</div>";
     },
-    choices: ["continue"],
+    choices: ["Continue"],
     button_html: `
       <button class = "jspsych-btn study_btn">%choice%</button>
     `,
@@ -241,10 +228,18 @@ var semantic_word_list = ["Kel", "Lav","Froom","Tust","Bosa","Darg","Noz","Reng"
   };
 
 // comprehension trial -- need to change to click on
-  var comprehension_trial = {
+  var comprehension_test = {
     type: jsPsychAudioKeyboardResponse,
     stimulus: function(){
-      var word = word_list[jsPsych.timelineVariable('index')];
+      if (jsPsych.timelineVariable('block') == "semantic") {
+        word = semantic_word_list[jsPsych.timelineVariable('index')];
+      }
+      if (jsPsych.timelineVariable('block') == "phonological") {
+        word = phological_word_list[jsPsych.timelineVariable('index')];
+      }
+      if (jsPsych.timelineVariable('block') == "none") {
+        word = none_word_list[jsPsych.timelineVariable('index')];
+      }
       return "audio/Click" + word + ".flac"
     },
     prompt: function(){
@@ -270,21 +265,38 @@ var semantic_word_list = ["Kel", "Lav","Froom","Tust","Bosa","Darg","Noz","Reng"
 
   };
 
-//production trial
- var production = {
+//production training -- on_finish to play correct audio stimuli
+ var production_training = {
    type: jsPsychHtmlAudioResponse,
-   stimulus: function() {
-     var target = "<img style='height:200px;' src='" +
-     jsPsych.timelineVariable('stimulus', true) +
-     "'>"
-     var text = "speak the name of the image aloud"
-     return target;
-     recording_duration: 100000
+   stimulus: function(){
+     if (jsPsych.timelineVariable('block') == "semantic") {
+       image_list = semantic_image_list;
+     }
+     if (jsPsych.timelineVariable('block') == "phonological") {
+       image_list = phonological_image_list;
+     }
+     if (jsPsych.timelineVariable('block') == "none") {
+       image_list = none_image_list;
+     }
+     var target_image = image_list[jsPsych.timelineVariable('index')];
+     var html_target_image = "<img class = 'target' src = '" + target_image + "'>";
+     var html_image_list = [html_target_image];
+     for (let i = 0; i < image_list.length; i++) {
+       if (i != jsPsych.timelineVariable('index')) {
+         var html_foil_image = "<img class = 'foil' src = '" + image_list[i] + "'>";
+         html_image_list.push(html_foil_image);
+       }
+     }
+     shuffle(html_image_list);
+     var html_images_string = html_image_list.join("");
+     return "<div class = 'grid study_grid'>" + html_images_string + "</div>";
    },
+   recording_duration: 10000,
+   show_done_button: TRUE,
  };
 
 //introduction trials (one on screen)
-  var study_trials = {
+  var introduction_trials = {
     timeline: [introduction, fixation],
     timeline_variables: sem_index_list,
     randomize_order: true,
@@ -297,12 +309,19 @@ var semantic_word_list = ["Kel", "Lav","Froom","Tust","Bosa","Darg","Noz","Reng"
        randomize_order: true,
      };
 
-//semantic comprehension block
+//comprehension test
  var comp_test_trials = {
    timeline: [comprehension_trial, fixation],
-   timeline_variables: comp_stimuli,
+   timeline_variables: sem_index_list,
    randomize_order: true,
  };
+
+ //production training block
+  var production_training_trials = {
+    timeline: [production_training, fixation],
+    timeline_variables: sem_index_list,
+    randomize_order: true,
+  };
 
   // randomization for final test trials
       var trial_structure = function(){
@@ -368,7 +387,7 @@ var semantic_word_list = ["Kel", "Lav","Froom","Tust","Bosa","Darg","Noz","Reng"
   // Putting together the timeline can be done in multiple ways. This example is just one way to do it.
 
   // First, define the order of trials. The 'test_procedure' is nested within this larger timeline.
-  let timelineBare = [preload, welcome, study_training_trials];
+  let timelineBare = [preload, welcome, initmicrophone, production_trials];
 
   // This object allows you to add on any data to every single trial's data object.
   // You can use this as desired, such as using "on_finish" to perform a task after every trial.

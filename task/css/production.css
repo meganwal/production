@@ -1,3 +1,9 @@
+.img {
+  height: 50vh;
+  width: 50vh;
+  position: relative;
+}
+
 .target {
   border: 1vh solid blue;
 }
