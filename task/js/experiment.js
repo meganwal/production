@@ -197,7 +197,7 @@ var semantic_word_list = ["Kel", "Lav","Froom","Tust","Bosa","Darg","Noz","Reng"
       }
       return "audio/This" + word + ".flac"
     },
-    prompt: function(){
+    prompt: function() {
       if (jsPsych.timelineVariable('block') == "semantic") {
         image_list = semantic_image_list;
       }
@@ -292,7 +292,7 @@ var semantic_word_list = ["Kel", "Lav","Froom","Tust","Bosa","Darg","Noz","Reng"
      return "<div class = 'grid study_grid'>" + html_images_string + "</div>";
    },
    recording_duration: 10000,
-   show_done_button: TRUE,
+   show_done_button: true,
  };
 
 //introduction trials (one on screen)
@@ -311,7 +311,7 @@ var semantic_word_list = ["Kel", "Lav","Froom","Tust","Bosa","Darg","Noz","Reng"
 
 //comprehension test
  var comp_test_trials = {
-   timeline: [comprehension_trial, fixation],
+   timeline: [comprehension_test, fixation],
    timeline_variables: sem_index_list,
    randomize_order: true,
  };
@@ -387,7 +387,7 @@ var semantic_word_list = ["Kel", "Lav","Froom","Tust","Bosa","Darg","Noz","Reng"
   // Putting together the timeline can be done in multiple ways. This example is just one way to do it.
 
   // First, define the order of trials. The 'test_procedure' is nested within this larger timeline.
-  let timelineBare = [preload, welcome, initmicrophone, production_trials];
+  let timelineBare = [preload, welcome, introduction_trials];
 
   // This object allows you to add on any data to every single trial's data object.
   // You can use this as desired, such as using "on_finish" to perform a task after every trial.
