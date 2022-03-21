@@ -122,17 +122,17 @@ var semantic_word_list = ["Kel", "Lav","Froom","Tust","Bosa","Darg","Noz","Reng"
 
 var order = 1 // replace with JATOS batch variable
 
-var welcome = {
-  type: jsPsychHtmlButtonResponse,
-  stimulus: "<p Welcome to the experiment. </p> <p In this game, you will asked to remember the names of a set of picutres. </p> <p Press 'continue' to begin.</p>",
-  choices:['continue'],
-  data: {
-    order: order,
-    semantic_image_list: semantic_image_list,
-    semantic_word_list: semantic_word_list,
-    // comp lists and phon lists
-  }
-};
+//intro screen
+  var welcome = {
+    type: jsPsychHtmlKeyboardResponse,
+    stimulus: "Welcome to the experiment. Press any key to begin.",
+    data: {
+      order: order,
+      semantic_image_list: semantic_image_list,
+      semantic_word_list: semantic_word_list,
+      // comp lists and phon lists
+    }
+  };
 
 //microphone permissions
  var initmicrophone = {
@@ -218,152 +218,6 @@ var none_index_list = [{index: 0, block: 'none'}, {index: 1, block: 'none'},{ind
     trial_duration: 1000,
   };
 
-//study training trial
-  var study_training = {
-    type: jsPsychAudioButtonResponse,
-    stimulus: function(){
-      if (jsPsych.timelineVariable('block') == "semantic") {
-        word = semantic_word_list[jsPsych.timelineVariable('index')];
-      }
-      if (jsPsych.timelineVariable('block') == "phonological") {
-        word = phological_word_list[jsPsych.timelineVariable('index')];
-      }
-      if (jsPsych.timelineVariable('block') == "none") {
-        word = none_word_list[jsPsych.timelineVariable('index')];
-      }
-      return "audio/This" + word + ".flac"
-    },
-    prompt: function() {
-      if (jsPsych.timelineVariable('block') == "semantic") {
-        image_list = semantic_image_list;
-      }
-      if (jsPsych.timelineVariable('block') == "phonological") {
-        image_list = phonological_image_list;
-      }
-      if (jsPsych.timelineVariable('block') == "none") {
-        image_list = none_image_list;
-      }
-      var target_image = image_list[jsPsych.timelineVariable('index')];
-      var html_target_image = "<img class = 'selected' id = 'target' src = '" + target_image + "'>";
-      var html_image_list = [html_target_image];
-      for (let i = 0; i < image_list.length; i++) {
-        if (i != jsPsych.timelineVariable('index')) {
-          var html_foil_image = "<img class = 'unselected' id = 'foil' src = '" + image_list[i] + "'>";
-          html_image_list.push(html_foil_image);
-        }
-      }
-      shuffle(html_image_list);
-      var html_images_string = html_image_list.join("");
-      return "<div class = 'grid study_grid'>" + html_images_string + "</div>";
-    },
-    choices: ["Continue"],
-    button_html: `
-      <button class = "jspsych-btn study_btn">%choice%</button>
-    `,
-    response_allowed_while_playing: false,
-    data: {
-        task: 'training',
-        block: jsPsych.timelineVariable('block'),
-        target_image: function() {
-          if (jsPsych.timelineVariable('block') == "semantic") {
-              image_list = semantic_image_list;
-          }
-          if (jsPsych.timelineVariable('block') == "phonological") {
-            image_list = phonological_image_list;
-          }
-          if (jsPsych.timelineVariable('block') == "none") {
-            image_list = none_image_list;
-          }
-          var target_image = image_list[jsPsych.timelineVariable('index')];
-        },
-        audio_stimulus: function(){
-          if (jsPsych.timelineVariable('block') == "semantic") {
-            word = semantic_word_list[jsPsych.timelineVariable('index')];
-          }
-          if (jsPsych.timelineVariable('block') == "phonological") {
-            word = phological_word_list[jsPsych.timelineVariable('index')];
-          }
-          if (jsPsych.timelineVariable('block') == "none") {
-            word = none_word_list[jsPsych.timelineVariable('index')];
-          }
-          return "audio/This" + word + ".flac"
-        },
-    },
-  };
-
-  // comprehension test
-  var comprehension_test = {
-    type: jsPsychAudioImageButtonResponse,
-    stimulus: function(){
-      if (jsPsych.timelineVariable('block') == "semantic") {
-        word = semantic_word_list[jsPsych.timelineVariable('index')];
-      }
-      if (jsPsych.timelineVariable('block') == "phonological") {
-        word = phological_word_list[jsPsych.timelineVariable('index')];
-      }
-      if (jsPsych.timelineVariable('block') == "none") {
-        word = none_word_list[jsPsych.timelineVariable('index')];
-      }
-      return "audio/Click" + word + ".flac"
-    },
-    choices: "",
-    button_html: function() {
-      if (jsPsych.timelineVariable('block') == "semantic") {
-        image_list = semantic_image_list;
-        word_list = semantic_word_list;
-      }
-      if (jsPsych.timelineVariable('block') == "phonological") {
-        image_list = phonological_image_list;
-        word_list = phonological_word_list;
-      }
-      if (jsPsych.timelineVariable('block') == "none") {
-        image_list = none_image_list;
-        word_list = none_word_list;
-      }
-      var target_image = image_list[jsPsych.timelineVariable('index')];
-      var html_target_image = "<img class = 'jspsych-audio-button-response-button unselected' id = 'target' src = '" + target_image + "'>";
-      var html_image_list = [html_target_image];
-      for (let i = 0; i < image_list.length; i++) {
-        if (i != jsPsych.timelineVariable('index')) {
-          var html_foil_image = "<img class = 'jspsych-audio-button-response-button unselected' id = 'foil' data-choice = {image: " + image_list[i] + ", word: " + word_list[i] + "} src = '" + image_list[i] + "'>";
-          html_image_list.push(html_foil_image);
-        }
-      }
-      shuffle(html_image_list);
-      var html_images_string = html_image_list.join("");
-      return "<div class = 'grid'>" + html_images_string + "</div>";
-    },
-    trial_duration: 80000,
-    data: {
-      task: 'training',
-      block: jsPsych.timelineVariable('block'),
-      target_image: function() {
-        if (jsPsych.timelineVariable('block') == "semantic") {
-            image_list = semantic_image_list;
-        }
-        if (jsPsych.timelineVariable('block') == "phonological") {
-          image_list = phonological_image_list;
-        }
-        if (jsPsych.timelineVariable('block') == "none") {
-          image_list = none_image_list;
-        }
-        var target_image = image_list[jsPsych.timelineVariable('index')];
-      },
-      audio_stimulus: function() {
-        if (jsPsych.timelineVariable('block') == "semantic") {
-          word = semantic_word_list[jsPsych.timelineVariable('index')];
-        }
-        if (jsPsych.timelineVariable('block') == "phonological") {
-          word = phological_word_list[jsPsych.timelineVariable('index')];
-        }
-        if (jsPsych.timelineVariable('block') == "none") {
-          word = none_word_list[jsPsych.timelineVariable('index')];
-        }
-        return "audio/Click" + word + ".flac"
-      },
-    },
-  };
-
 //production training -- on_finish to play correct audio stimuli
  var production_training = {
    type: jsPsychHtmlAudioResponse,
@@ -423,6 +277,80 @@ var none_index_list = [{index: 0, block: 'none'}, {index: 1, block: 'none'},{ind
     },
  };
 
+ // comprehension test
+ var comprehension_test = {
+   type: jsPsychAudioImageButtonResponse,
+   stimulus: function(){
+     if (jsPsych.timelineVariable('block') == "semantic") {
+       word = semantic_word_list[jsPsych.timelineVariable('index')];
+     }
+     if (jsPsych.timelineVariable('block') == "phonological") {
+       word = phological_word_list[jsPsych.timelineVariable('index')];
+     }
+     if (jsPsych.timelineVariable('block') == "none") {
+       word = none_word_list[jsPsych.timelineVariable('index')];
+     }
+     return "audio/Click" + word + ".flac"
+   },
+   choices: "",
+   button_html: function() {
+     if (jsPsych.timelineVariable('block') == "semantic") {
+       image_list = semantic_image_list;
+       word_list = semantic_word_list;
+     }
+     if (jsPsych.timelineVariable('block') == "phonological") {
+       image_list = phonological_image_list;
+       word_list = phonological_word_list;
+     }
+     if (jsPsych.timelineVariable('block') == "none") {
+       image_list = none_image_list;
+       word_list = none_word_list;
+     }
+     var target_image = image_list[jsPsych.timelineVariable('index')];
+     var html_target_image = "<img class = 'jspsych-audio-button-response-button unselected' id = 'target' src = '" + target_image + "'>";
+     var html_image_list = [html_target_image];
+     for (let i = 0; i < image_list.length; i++) {
+       if (i != jsPsych.timelineVariable('index')) {
+         var html_foil_image = "<img class = 'jspsych-audio-button-response-button unselected' id = 'foil' data-choice = {image: " + image_list[i] + ", word: " + word_list[i] + "} src = '" + image_list[i] + "'>";
+         html_image_list.push(html_foil_image);
+       }
+     }
+     shuffle(html_image_list);
+     var html_images_string = html_image_list.join("");
+     return "<div class = 'grid'>" + html_images_string + "</div>";
+   },
+   trial_duration: 80000,
+   data: {
+     task: 'test',
+     block: jsPsych.timelineVariable('block'),
+     target_image: function() {
+       if (jsPsych.timelineVariable('block') == "semantic") {
+           image_list = semantic_image_list;
+       }
+       if (jsPsych.timelineVariable('block') == "phonological") {
+         image_list = phonological_image_list;
+       }
+       if (jsPsych.timelineVariable('block') == "none") {
+         image_list = none_image_list;
+       }
+       var target_image = image_list[jsPsych.timelineVariable('index')];
+     },
+     audio_stimulus: function() {
+       if (jsPsych.timelineVariable('block') == "semantic") {
+         word = semantic_word_list[jsPsych.timelineVariable('index')];
+       }
+       if (jsPsych.timelineVariable('block') == "phonological") {
+         word = phological_word_list[jsPsych.timelineVariable('index')];
+       }
+       if (jsPsych.timelineVariable('block') == "none") {
+         word = none_word_list[jsPsych.timelineVariable('index')];
+       }
+       return "audio/Click" + word + ".flac"
+     },
+   },
+ };
+
+
 //introduction trials (one on screen)
   var introduction_trials = {
     timeline: [introduction, fixation],
@@ -430,92 +358,26 @@ var none_index_list = [{index: 0, block: 'none'}, {index: 1, block: 'none'},{ind
     randomize_order: true,
   };
 
-//training trials (9 on screen)
- var study_training_trials = {
-       timeline: [study_training, fixation],
-       timeline_variables: sem_index_list,
-       randomize_order: true,
-     };
+//production training
+   var production_training_trials = {
+     timeline: [production_training, fixation],
+     timeline_variables: sem_index_list,
+     randomize_order: true,
+   };
 
-//comprehension training
- var comprehension_training_trials = {
-   timeline: [comprehension_training, fixation],
+//comprehension test
+ var comprehension_test_trials = {
+   timeline: [comprehension_test, fixation],
    timeline_variables: sem_index_list,
    randomize_order: true,
  };
-
- //production training block
-  var production_training_trials = {
-    timeline: [production_training, fixation],
-    timeline_variables: sem_index_list,
-    randomize_order: true,
-  };
-
-  // randomization for final test trials
-      var trial_structure = function(){
-        var all_stims = []
-        var targets = [
-          {type: "sem", images: [1,2,3,4,5,6,7,8,9]},
-          {type: "neither", images: [10,11,12,13,14,15,16,17,18]},
-          {type: "phon", images: [19,20,21,22,23,24,25,26,27]}]
-
-        var original_foils = _.cloneDeep(targets)
-        var foils = _.cloneDeep(original_foils)
-
-        _.map(targets, function(o){o['images'] = _.shuffle(o['images'])})
-        _.map(foils, function(o){o['images'] = _.shuffle(o['images'])})
-
-        var types = ["sem", "neither", "phon"]
-
-        var this_type_array;
-        var this_target;
-        var this_foils = [];
-        var tmp_foils;
-        var tmp_foil_images;
-        var target_idx;
-
-        for (var i = 0; i < 9; i++) {
-          for(const this_type of types) {
-
-            this_type_array =  _.find(targets, ['type', this_type])
-            this_target = this_type_array['images'].splice(0,1)
-            this_foils = [];
-
-            for(const this_foil_type of types) {
-
-              if(this_foil_type == this_type) {
-                tmp_foils = _.find(foils, ['type', this_foil_type])
-                tmp_foil_images = tmp_foils['images']
-                target_idx = tmp_foil_images.findIndex((element) => element == this_target)
-
-                if(target_idx == 0) {
-                  this_foils.push(tmp_foil_images.splice(1,2))
-                } else if(target_idx == 1) {
-                  this_foils.push(tmp_foil_images.splice(0,1))
-                  this_foils.push(tmp_foil_images.splice(1,1))
-                } else {
-                  this_foils.push(tmp_foil_images.splice(0,2))
-                }
-
-              } else {
-                tmp_foils = _.find(foils, ['type', this_foil_type])
-                this_foils.push(tmp_foils['images'].splice(0,3))
-              }
-            }
-
-            all_stims.push({target:_.first(this_target), foils: _.flatten(this_foils)})
-          }
-          foils = _.cloneDeep(original_foils)
-        }
-        return all_stims
-      }
 
   // CREATING TIMELINE
 
   // Putting together the timeline can be done in multiple ways. This example is just one way to do it.
 
   // First, define the order of trials. The 'test_procedure' is nested within this larger timeline.
-  let timelineBare = [preload, comprehension_training_trials];
+  let timelineBare = [preload, welcome, introduction_trials, production_training_trials, comprehension_test_trials];
 
   // This object allows you to add on any data to every single trial's data object.
   // You can use this as desired, such as using "on_finish" to perform a task after every trial.

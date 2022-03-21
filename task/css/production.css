@@ -4,11 +4,11 @@
   position: relative;
 }
 
-.target {
+.selected {
   border: 1vh solid blue;
 }
 
-.foil {
+.unselected {
   border: 1vh solid white;
 }
 
@@ -20,12 +20,12 @@
 }
 
 .study_grid {
-  bottom: 8vh;
+  bottom: 6vh;
   position: relative;
 }
 
 .study_btn {
-  top: 85vh;
+  top: 3vh;
   position: relative;
 }
 

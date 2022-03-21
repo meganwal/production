@@ -122,17 +122,17 @@ var semantic_word_list = ["Kel", "Lav","Froom","Tust","Bosa","Darg","Noz","Reng"
 
 var order = 1 // replace with JATOS batch variable
 
-var welcome = {
-  type: jsPsychHtmlButtonResponse,
-  stimulus: "<p Welcome to the experiment. </p> <p In this game, you will asked to remember the names of a set of picutres. </p> <p Press 'continue' to begin.</p>",
-  choices:['continue'],
-  data: {
-    order: order,
-    semantic_image_list: semantic_image_list,
-    semantic_word_list: semantic_word_list,
-    // comp lists and phon lists
-  }
-};
+//intro screen
+  var welcome = {
+    type: jsPsychHtmlKeyboardResponse,
+    stimulus: "Welcome to the experiment. Press any key to begin.",
+    data: {
+      order: order,
+      semantic_image_list: semantic_image_list,
+      semantic_word_list: semantic_word_list,
+      // comp lists and phon lists
+    }
+  };
 
 //microphone permissions
  var initmicrophone = {
