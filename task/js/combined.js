@@ -464,17 +464,17 @@ jatos.onLoad(function() {
   var trial_structure = function(){
     var all_stims = []
     var targets = [
-      {type: "sem", images: [1,2,3,4,5,6,7,8,9]},
-      {type: "neither", images: [10,11,12,13,14,15,16,17,18]},
-      {type: "phon", images: [19,20,21,22,23,24,25,26,27]}]
+      {type: "sem", indicies: _.range(8)},
+      {type: "neither", indicies: _.range(8)},
+      {type: "phon", indicies: _.range(8)}
 
     var original_foils = _.cloneDeep(targets)
     var foils = _.cloneDeep(original_foils)
 
-    _.map(targets, function(o){o['images'] = _.shuffle(o['images'])})
-    _.map(foils, function(o){o['images'] = _.shuffle(o['images'])})
+    _.map(targets, function(o){o['indicies'] = _.shuffle(o['indicies'])})
+    _.map(foils, function(o){o['indicies'] = _.shuffle(o['indicies'])})
 
-    var types = ["sem", "neither", "phon"]
+    var types = ["sem", "unrel", "phon"]
 
     var this_type_array;
     var this_target;
@@ -487,14 +487,16 @@ jatos.onLoad(function() {
       for(const this_type of types) {
 
         this_type_array =  _.find(targets, ['type', this_type])
-        this_target = this_type_array['images'].splice(0,1)
+        this_target = this_type_array['indicies'].splice(0,1)
+        var target_image =
+        var target_word = 
         this_foils = [];
 
         for(const this_foil_type of types) {
 
           if(this_foil_type == this_type) {
             tmp_foils = _.find(foils, ['type', this_foil_type])
-            tmp_foil_images = tmp_foils['images']
+            tmp_foil_images = tmp_foils['indicies']
             target_idx = tmp_foil_images.findIndex((element) => element == this_target)
 
             if(target_idx == 0) {
@@ -508,7 +510,7 @@ jatos.onLoad(function() {
 
           } else {
             tmp_foils = _.find(foils, ['type', this_foil_type])
-            this_foils.push(tmp_foils['images'].splice(0,3))
+            this_foils.push(tmp_foils['indicies'].splice(0,3))
           }
         }
 
