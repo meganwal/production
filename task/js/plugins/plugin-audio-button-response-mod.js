@@ -1,10 +1,15 @@
-// Modifications: Add prompt to data; Place button below prompt.
+// Modifications:
+// - Moved prompt above button.
+// - Added lower_btn class to lower button.
+// - Added prompt to trial data.
 
-var jsPsychAudioButtonResponse = (function (jspsych) {
+
+
+var jsPsychAudioButtonResponseMod = (function (jspsych) {
   'use strict';
 
   const info = {
-      name: "audio-button-response",
+      name: "audio-button-response-mod",
       parameters: {
           /** The audio to be played. */
           stimulus: {
@@ -81,7 +86,7 @@ var jsPsychAudioButtonResponse = (function (jspsych) {
    * @author Kristin Diep
    * @see {@link https://www.jspsych.org/plugins/jspsych-audio-button-response/ audio-button-response plugin documentation on jspsych.org}
    */
-  class AudioButtonResponsePlugin {
+  class AudioButtonResponseModPlugin {
       constructor(jsPsych) {
           this.jsPsych = jsPsych;
       }
@@ -132,7 +137,7 @@ var jsPsychAudioButtonResponse = (function (jspsych) {
                       buttons = trial.button_html;
                   }
                   else {
-                      console.error("Error in audio-button-response plugin. The length of the button_html array does not equal the length of the choices array");
+                      console.error("Error in audio-button-response-mod plugin. The length of the button_html array does not equal the length of the choices array");
                   }
               }
               else {
@@ -140,16 +145,21 @@ var jsPsychAudioButtonResponse = (function (jspsych) {
                       buttons.push(trial.button_html);
                   }
               }
+
+              // MODIFICATION: MOVED PROMPT ABOVE BUTTON
               var html = '';
               //show prompt if there is one
               if (trial.prompt !== null) {
                   html += trial.prompt;
               }
+
               html += '<div id="jspsych-audio-button-response-btngroup">';
               for (var i = 0; i < trial.choices.length; i++) {
                   var str = buttons[i].replace(/%choice%/g, trial.choices[i]);
+
+                  // MODIFICATION: ADDED lower_btn CLASS TO LOWER BUTTON
                   html +=
-                      '<div class="jspsych-audio-button-response-button" style="cursor: pointer; display: inline-block; margin:' +
+                      '<div class="jspsych-audio-button-response-button lower_btn" style="cursor: pointer; display: inline-block; margin:' +
                           trial.margin_vertical +
                           " " +
                           trial.margin_horizontal +
@@ -160,6 +170,7 @@ var jsPsychAudioButtonResponse = (function (jspsych) {
                           '">' +
                           str +
                           "</div>";
+
               }
               html += "</div>";
               display_element.innerHTML = html;
@@ -223,6 +234,8 @@ var jsPsychAudioButtonResponse = (function (jspsych) {
                   rt: response.rt,
                   stimulus: trial.stimulus,
                   response: response.button,
+
+                  // MODIFICATION: ADDED PROMPT TO TRIAL DATA
                   prompt: trial.prompt,
               };
               // clear the display
@@ -301,8 +314,8 @@ var jsPsychAudioButtonResponse = (function (jspsych) {
           });
       }
   }
-  AudioButtonResponsePlugin.info = info;
+  AudioButtonResponseModPlugin.info = info;
 
-  return AudioButtonResponsePlugin;
+  return AudioButtonResponseModPlugin;
 
 })(jsPsychModule);

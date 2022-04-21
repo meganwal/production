@@ -1,0 +1,65 @@
+
+/* Image CSS */
+.img {
+  height: 50vh;
+  width: 50vh;
+  position: relative;
+}
+.selected {
+  border: 1vh solid blue;
+}
+.unselected {
+  border: 1vh solid white;
+}
+.correct {
+  border: 1vh solid green;
+}
+
+/* Square grid design for images (3 x 3) */
+.grid {
+  display: grid;
+  height: 80vh;
+  width: 80vh;
+  grid-template-columns: 1fr 1fr 1fr;
+}
+.grid>* {
+  width: 100%;
+  height: auto;
+  box-sizing: border-box;
+}
+
+/* Add space between images and button */
+.lower_btn {
+  top: 3vh;
+  position: relative;
+}
+
+/* Fixation cross */
+.fixation {
+  font-size: 60px;
+}
+
+/* Prevent instruction text from spanning whole screen  */
+.instructions_text {
+  width:  800px;
+}
+
+/* instructions reminder  */
+.reminder_text {
+  width:  800px;
+  color: black;
+}
+/* hidden time reminder text  */
+.hidden_text {
+  width:  800px;
+  color: white;
+  top: 3vh;
+  position: relative;
+}
+/* visible time reminder text  */
+.visible_text {
+  width:  800px;
+  color: red;
+  top: 3vh;
+  position: relative;
+}

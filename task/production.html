@@ -1,21 +1,4 @@
-<!--
-
-	This is the HTML page for your experiment.
-	This loads the JavaScript for your experiment (in this case, 'experiment.js').
-
-	This corresponds to a single Component in JATOS, with 'experiment.html' being the 'HTML file path'.
-	See 'Instructions for Running an Online Experiment: Creating a new study in JATOS' for more info.
-
-	If you wish to have multiple Components for your experiment, you will need mutliple HTML files, each loading a JavaScript file specific to that Component.
-
-	INSTRUCTIONS FOR MODIFICATION:
-
-	Below line 29, you will need to modify this to load the jsPsych plugins particular to your experiment.
-	You should also add these plugins to 'js > plugins' if they are not already present.
-
--->
-
-
+<!-- HTML for PRODUCTION condition -->
 
 <!DOCTYPE html>
 <html lang="en">
@@ -23,29 +6,31 @@
 		<title>CMU Psychology Experiment</title>
 		<meta charset="UTF-8">
 
-		<!-- These two JavaScript files are loaded for jsPsych and JATOS to function correctly. -->
-		<script src="https://unpkg.com/jspsych@7.1.2"></script>
+		<!-- jsPsych and JATOS -->
+		<script src="https://unpkg.com/jspsych@7.2.1"></script>
 		<script src = "jatos.js"></script>
 
-		<!-- Load the jsPsych plugins needed for your experiment here. -->
-	    <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.0.0"></script>
-	    <script src="https://unpkg.com/@jspsych/plugin-html-button-response@1.0.0"></script>
-	    <script src="https://unpkg.com/@jspsych/plugin-image-button-response@1.0.0"></script>
-	    <script src="https://unpkg.com/@jspsych/plugin-audio-keyboard-response@1.0.0"></script>
-		<script src="js/plugins/plugin-audio-button-response-mod.js"></script>
-		<script src="js/plugins/plugin-audio-image-button-response.js"></script>
-	    <script src="https://unpkg.com/@jspsych/plugin-html-audio-response@1.0.0"></script>
-	    <script src="https://unpkg.com/@jspsych/plugin-preload@1.0.0"></script>
-	    <script src="https://unpkg.com/@jspsych/plugin-initialize-microphone@1.0.0"></script>
-	    <script src="https://unpkg.com/@jspsych/plugin-survey-text@1.0.0"></script>
-	    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
+		<!-- jsPsych plugins -->
+		<script src="https://unpkg.com/@jspsych/plugin-preload@1.1.0"></script>
+		<script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.1.0"></script>
+		<script src="https://unpkg.com/@jspsych/plugin-html-button-response@1.1.0"></script>
+		<script src="https://unpkg.com/@jspsych/plugin-initialize-microphone@1.0.0"></script>
+		<script src="https://unpkg.com/@jspsych/plugin-html-audio-response@1.0.0"></script>
 
-		<!-- Load your experiment JavaScript file here.-->
+		<!-- Custom plugins -->
+		<script src="js/plugins/plugin-audio-button-response-mod.js"></script>
+		<script src="js/plugins/plugin-html-audio-response-mod.js"></script>
+		<script src="js/plugins/plugin-audio-image-button-response-no-feedback.js"></script>
+		<script src="js/plugins/plugin-html-audio-response-no-feedback.js"></script>
+
+		<!-- Experiment JavaScript -->
         <script src = "js/production.js"></script>
 
-        <!-- We load CSS styling here. -->
-		<link href="css/production.css" rel="stylesheet" type="text/css" />
-		<link href="https://unpkg.com/jspsych@7.1.2/css/jspsych.css" rel="stylesheet" type="text/css" />
+        <!-- jsPsych styling -->
+		<link href="https://unpkg.com/jspsych@7.2.1/css/jspsych.css" rel="stylesheet" type="text/css" />
+
+        <!-- Custom styling -->
+		<link href="css/custom.css" rel="stylesheet" type="text/css" />
 		<link rel="icon" href="css/university.png" />
 	</head>
 	<body>

@@ -1,0 +1,580 @@
+﻿<!DOCTYPE html>
+<!-- originally written Francis Ng, updated for jsPsych 7.2 by Megan Waler  -->
+<html>
+    <head>
+        <!-- character encoding -->
+        <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+        <meta content="utf-8" http-equiv="encoding">
+        <!-- Title of the window -->
+        <title>Corsi Blocks task</title>
+        <!-- Gibeau, R.-M. (submitted)                                      -->
+        <!--     The Corsi Blocks task: Variations and coding with jsPsych. -->
+        <!--     The Quantitative Methods for Psychology.                   -->
+
+        <!-- declaring the jsPsych functions needed -->
+        <!-- note that jspsych-html-keyboard-response-noerase.js IS NOT part of the standard bundle -->
+    		<script src="https://unpkg.com/jspsych@7.2.1"></script>
+    		<script src = "jatos.js"></script>
+        <script src="jspsych-6.1.0/plugins/jspsych-html-keyboard-response-noerase.js"></script>
+        <script src="https://unpkg.com/@jspsych/plugin-preload@1.1.0"></script>
+        <script src="https://unpkg.com/@jspsych/plugin-instructions@1.1.0"></script>
+    		<script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.1.0"></script>
+        <script src="https://unpkg.com/@jspsych/plugin-audio-button-response@1.1.0"></script>
+    		<script src="https://unpkg.com/@jspsych/plugin-audio-keyboard-response@1.1.0"></script>
+        <script src="https://unpkg.com/@jspsych/plugin-html-button-response@1.1.0"></script>
+        <script src="https://unpkg.com/@jspsych/plugin-fullscreen@1.1.0"></script>
+        <script src="https://unpkg.com/@jspsych/plugin-call-function@1.1.0"></script>
+
+        <!-- uploading the jsPsych style sheet -->
+        <link href="https://unpkg.com/jspsych@7.2.1/css/jspsych.css" rel="stylesheet" type="text/css" />
+        <!-- Custom styling -->
+        <link href="css/custom.css" rel="stylesheet" type="text/css" />
+    		<link rel="icon" href="css/university.png" />
+    </head>
+
+    <body>
+        <script>
+
+  jatos.onLoad(function() {
+
+      // INITIALIZE JSPSYCH
+
+      let jsPsych = initJsPsych({
+        on_finish: function() {
+          let resultJson = jsPsych.data.get().json();
+          jatos.submitResultData(resultJson);
+          jatos.startNextComponent();
+        },
+      });
+            // ******************************
+            // *   Defining general stuff   *
+            // ******************************
+
+            console.log('Begining of the parameter definitions')
+
+            // Experiment parameters
+            var nItems              = 10       // total number of squares on the display
+            // the sequence lengths to test the participant with, with the variable "OneSequenceLength"
+            var sequenceLengths     = [{OneSequenceLength: 3},
+                                            {OneSequenceLength: 4},{OneSequenceLength: 5},
+                                            {OneSequenceLength: 6},{OneSequenceLength: 7},
+                                            {OneSequenceLength: 8},{OneSequenceLength: 9},
+                                            {OneSequenceLength: 10}];
+            var practiceSequences   = [{OneSequenceLength: 3}];
+            var sequenceRandomOrder = false   // true for "random" or false for "sequential"
+            var sequenceRepetition  = 2       // how many times each length is tested
+
+            // Trial parameters
+            var InterTrialDuration   = 1000  // e.g., REF
+            var FixationDuration     = 1000  // e.g., REF
+            var MouseToBeHidden      = true
+            var PreBlinkDuration     = 500  // e.g., REF
+            var BlinkDuration        = 400  // e.g., REF
+            var PostBlinkDuration    = 500  // e.g., REF
+            var InterBlinkDuration   = 400  // e.g., REF
+            var RecallSignal         = 'audio/500hz-400ms.wav'
+            var RecallSignalDuration = 400
+            var AcknowledgeDuration  = 200  // e.g., REF
+
+            // Item parameters; assembled using makeItem
+            var BackgroundColor   = "white"        // accept the HTML-defined colors
+            var TextColor         = "black"        					//
+            var OneItemShape      = "rect"             // one of the svg primitive
+            var OneItemShownColor = "rgb(0,0,0)"       // black
+            var OneItemBlinkColor = "rgb(127,127,127)" // gray
+            var OneItemClickColor = "rgb(0,0,255)"     // blue
+            var OneItemSize       = 1/6               // proportion of the item relative to minscreen
+            var OneItemMargin     = 1/50               // margin to leave empty around the item, relative to minscreen
+
+            console.log('End of the parameter definitions')
+
+            // *************************************************
+            // *   THIS IS IT! Everything beyond this point    *
+            // *   will run nicely from the above definitions  *
+            // *************************************************
+
+            // set the background color
+            document.body.style.backgroundColor = BackgroundColor;
+            document.body.style.color = TextColor;
+
+            // these two lines convert the relative sizes into pixel sizes LEAVE UNCHANGED
+            var OneItemSizePX     = Math.floor(OneItemSize * Math.min(screen.width, screen.height))
+            var OneItemMarginPX   = Math.floor(OneItemMargin * Math.min(screen.width, screen.height))
+            console.log(`Item dimensions in pixels are: (size) ${OneItemSizePX}, (margins) ${OneItemMarginPX}`);
+
+            // Function that builts an HTML svg (scalable vector graphic) image
+            // may need to be adapted if a different shape is chosen
+            var makeItem = function(color) {
+                return(`<svg width="100%" height="100%"><${OneItemShape} width="100%" height="100%" style="fill:${color};stroke-width:0;"></svg>`);
+            }
+
+            // Empty lists of items; are to be populated by PositionFunction
+            var ListOfItems         = new Array(nItems); // the array is full length bcse jsPsych updates it too slow
+            var ListOfBlinkingItems = new Array(nItems); // idem
+            var ListOfButtons       = new Array(nItems);
+            var TemplateListOfRandx = [0.8805, 0.6169, 0.6703, 0.3838, 0.1165, 0.2007, 0.4460, 0.3906, 0.8197, 0.9777];
+            var TemplateListOfRandy = [0.1575, 0.2113, 0.7113, 0.9379, 0.277, 0.619, 0.1705, 0.4672, 0.5612, 0.6086];
+            var CurrentTrial        = 0
+            var nBlinkingItems      = null;
+            var ListOrder = ["7301245689", "1290345678", "9140235678", //Practices
+                            "4961235780", "8350124679", "2913045678", "0478123569", //Main Trials
+                            "5201734689", "3469801257", "5410823679", "7194052368",
+                            "3895106247", "2681573049", "5328769014", "8031594726",
+                            "4723106589", "5369178024", "6315720984","2413679805"];
+
+
+            function str2array(string){
+                str_array = new Array(string.length);
+                for (i = 0; i < string.length; i++){
+                    str_array[i] = parseInt(string[i]);
+                }
+                return str_array;
+            }
+
+            function reorder(temp_array, order_array){
+                var new_array = new Array(temp_array.length);
+                for (i = 0; i < temp_array.length; i++){
+                    new_array[i] = temp_array[order_array[i]]
+                }
+                return new_array;
+            }
+            // Function that generates non-contiguous positions randomly.
+            // This function can place the items anywhere on screen
+            // while leaving an empty margin around the items.
+            var PositionFunction = function() {
+                // console.log("begin of PositionFunction");
+                // console.log("nBlinkingItems: ", nBlinkingItems);
+                // console.log("Current Trial: ", CurrentTrial);
+                var i, j;
+                var x, y;
+                var NewXList = reorder(TemplateListOfRandx, str2array(ListOrder[CurrentTrial]))
+                var NewYList = reorder(TemplateListOfRandy, str2array(ListOrder[CurrentTrial]))
+                var tooclose = true;
+                ListOfButtons.length = 0;
+
+                for (i = 0; i < nItems; i++){
+                    // console.log("Block ", i, " created");
+                    tooclose = true;
+                    while(tooclose) {
+                        tooclose = false;
+                        x = Math.floor(NewXList[i] * 80 );
+                        y = Math.floor(NewYList[i] * 80 );
+                        for (j= 0; j <i; j++) {
+                            if ((x > ListOfItems[j].x - OneItemSizePX - OneItemMarginPX)&&
+                                (x < ListOfItems[j].x + OneItemSizePX + OneItemMarginPX)&&
+                                (y > ListOfItems[j].y - OneItemSizePX - OneItemMarginPX)&&
+                                (y < ListOfItems[j].y + OneItemSizePX + OneItemMarginPX)){
+                                tooclose = false;
+                            };
+                        };
+                    };
+                    ListOfItems[i] = [];
+                    ListOfItems[i].x = x;
+                    ListOfItems[i].y = y;
+                    ListOfItems[i].ItemHTML  = `<p style = "position:absolute; margin-top: 0em; left: ${x}%; top: ${y}%; background: black; width: 8%; height: 0; padding-bottom: 8%;"></p>`;
+                    ListOfItems[i].ItemBLANK = `<p style = "position:absolute; margin-top: 0em; left: ${x}%; top: ${y}%; background: grey; width: 8%; height: 0; padding-bottom: 8%;"></p>`;
+                    ListOfItems[i].ItemACKNW = `<p style = "position:absolute; margin-top: 0em; left: ${x}%; top: ${y}%; background: blue; width: 8%; height: 0; padding-bottom: 8%;"></p>`;
+
+                    // ListOfRands[i] = [];
+                    // ListOfRands[i].x = rx;
+                    // ListOfRands[i].y = ry;
+
+                    // they are also concatenated in a list of buttons
+                    ListOfButtons.push(`<button type=button style = "position:absolute; `+
+                            `margin-top: 0px; padding: 0px; background: black; width: 8%; height: 0; padding-bottom: 8%;`+
+                            `border: none; left: ${x}%; top: ${y}%"></button>` );
+                    if (i< nBlinkingItems) {
+                        //  the first nBlinkingItems are also kept in a shorter list
+                        ListOfBlinkingItems[i] = [];
+                        ListOfBlinkingItems[i].x = x;
+                        ListOfBlinkingItems[i].y = y;
+                        ListOfBlinkingItems[i].ItemHTML  =  `<p style = "position:absolute; margin-top: 0em; left: ${x}%; top: ${y}%; background: black; width: 8%; height: 0; padding-bottom: 8%;"></p>`;
+                        ListOfBlinkingItems[i].ItemBLANK =  `<p style = "position:absolute; margin-top: 0em; left: ${x}%; top: ${y}%; background: blue; width: 8%; height: 0; padding-bottom: 8%;"></p>`;
+                    }
+                }
+                // console.log("ending of PositionFunction");
+                // console.log(ListOfRands);
+                CurrentTrial = CurrentTrial + 1;
+            }
+            console.log('End of the definitions')
+
+            //ADDED IN VARIABLES
+            var correctAttempts = 0;
+            jsPsych.data.addProperties({accuracy: false, extra: 1});
+            var tempAcc = false
+            var currentCycle = 0
+            var practiceScore = 0
+
+            // *************************************************
+            // *   THIS IS IT! Everything beyond this point    *
+            // *   will run nicely from the above definitions  *
+            // *************************************************
+
+            // mouse pointer functions
+            var HideMouse = function() { if (MouseToBeHidden) {
+                    document.querySelector('head').insertAdjacentHTML('beforeend', '<style id="cursor-toggle"> html { cursor: none; } </style>');
+                }
+            }
+            var ShowMouse = function() { if (MouseToBeHidden) {
+                    document.querySelector('#cursor-toggle').remove();
+                }
+            }
+
+            // ***************************************
+            // *   Defining experiment-level events  *
+            // ***************************************
+
+            // Toggle full screen on or off
+            var FullScreenOn = {
+                type: jsPsychFullscreen,
+                message: "<p>The experiment will be in full screen mode once you click on the button.</p>",
+                button_label: 'Full Screen Mode',
+                fullscreen_mode: true
+            }
+            var FullScreenOff = {
+                type: jsPsychFullscreen,
+                fullscreen_mode: false
+            }
+            // the Welcome and Bye object descriptions
+            var SayWelcome = {
+                type: jsPsychInstructions,
+                pages: ['<p>You will see 10 blocks on the screen. On each trial, several blocks will light up on at the time.</p>'+
+                '<p>Your job is to remember their exact sequence. </p>' +
+                '<p>As soon as the sequence is finished, you will hear a beep. </p>' +
+                '<p>After the beep, you must repeat the sequence by clicking on the blocks in the same order they were presented.</p>' +
+                '<p>Click "Next" to start.</p>' ],
+                show_clickable_nav: true,
+                button_label_next: 'Next'
+            }
+
+            var practice_instructions = { // Instructions of Practice
+            type: jsPsychInstructions,
+            pages: ['<p>We will first provide some practice.</p>'+
+            '<p>Remember to repeat the sequence in the exact same order that they appeared.</p>' +
+            '<p>Click "Next" to begin the practice.</p>' ],
+            show_clickable_nav: true,
+            button_label_next: 'Next'
+            };
+
+            var instructions_main = { // Instructions for main task
+            type: jsPsychInstructions,
+            pages: ['<p>The practice is now complete, good job!</p>'+
+            '<p>You will now no longer receive feedback </p>' +
+            '<p>We will begin with a sequence length of three. You will get two tries for each sequence length.</p>' +
+            '<p>The sequence length will increase by one whenever you get at least one of the two sequences of equal length correct.</p>' +
+            '<p>Click "Next" to begin.</p>' ],
+            show_clickable_nav: true,
+            button_label_next: 'Next'
+            };
+
+            var SayBye = {
+                type: jsPsychInstructions,
+                    pages: ['<p>You have completed this portion of the experiment.</p>'+
+                    '<p>Please click on "End" to proceed to the next task.</p>'],
+                    show_clickable_nav: true,
+                    button_label_next: 'End'
+                };
+
+
+            // ***************************************
+            // *     Defining trial-level events     *
+            // ***************************************
+
+            var SetnBlinkingItems = {
+                type: jsPsychCallFunction,
+                func: function() {
+                        nBlinkingItems =  jsPsych.timelineVariable("OneSequenceLength", true);
+                        currentBlinkingItem = 0;  // counter that will count the number of blinks
+                        currentResponse = 0;      // counter that will count the number of responses
+                    },
+            }
+            var GeneratePositions = {
+                type: jsPsychCallFunction,
+                func: PositionFunction
+             }
+            var WaitInterTrialDuration = {
+                type: 'html-keyboard-response-noerase',
+                stimulus: '',
+                choices: "NO_KEYS",
+                trial_duration: InterTrialDuration
+            }
+            var WaitPreBlinkDuration = {
+                type: 'html-keyboard-response-noerase',
+                stimulus: '',
+                choices: "NO_KEYS",
+                trial_duration: PreBlinkDuration
+            }
+            var WaitBlinkDuration = {
+                type: 'html-keyboard-response-noerase',
+                stimulus: '',
+                choices: "NO_KEYS",
+                trial_duration: BlinkDuration
+            }
+            var WaitInterBlinkDuration = {
+                type: 'html-keyboard-response-noerase',
+                stimulus: '',
+                choices: "NO_KEYS",
+                trial_duration: InterBlinkDuration
+            }
+            var WaitPostBlinkDuration = {
+                type: 'html-keyboard-response-noerase',
+                stimulus: '',
+                choices: "NO_KEYS",
+                trial_duration: PostBlinkDuration,
+            }
+            var ShowFixation = {
+                type: jsPsychHtmlKeyboardResponse,
+                stimulus: '+',
+                choices: "NO_KEYS",
+                trial_duration: FixationDuration,
+                on_start: HideMouse
+            }
+            var ShowOneItem = {
+                type: 'html-keyboard-response-noerase',
+                stimulus: jsPsych.timelineVariable('ItemHTML'),
+                choices: "NO_KEYS",
+                trial_duration: 0
+            }
+            var ShowAllItems = {
+                timeline: [ ShowOneItem ],
+                timeline_variables: ListOfItems
+            }
+            var BlinkOneItem = {
+                type: 'html-keyboard-response-noerase',
+                stimulus: jsPsych.timelineVariable('ItemBLANK'),
+                choices: "NO_KEYS",
+                trial_duration: 0,
+            }
+            var BlinkAllItems = {
+                timeline: [ BlinkOneItem, WaitBlinkDuration, ShowOneItem, WaitInterBlinkDuration ],
+                timeline_variables: ListOfBlinkingItems,
+                conditional_function: function() {if(currentBlinkingItem++ < nBlinkingItems) {return true;} else {return false;}}
+            }
+
+            var StartResponding = {
+                type: jsPsychAudioKeyboardResponse,
+                stimulus: RecallSignal,
+                choices: "NO_KEYS",
+                trial_duration: RecallSignalDuration,
+                on_start: ShowMouse
+            }
+            var BlinkThatResponse = {
+                type: jsPsychHtmlButtonResponse,
+                stimulus: '',
+                button_html: function() {
+                                var choice = jsPsych.data.get().last(1).values()[0].button_pressed;
+                                if (choice !== null) {return ListOfButtons.concat(ListOfItems[choice].ItemACKNW);}
+                                else {return "";}
+                            },
+                trial_duration: AcknowledgeDuration,
+                choices: function() {return [...Array(ListOfButtons.length+1).keys()]}
+            }
+            var ReadOneResponse = {
+                type: jsPsychHtmlButtonResponse,
+                stimulus: '',
+                button_html: ListOfButtons,
+                choices: function() {return [...Array(ListOfButtons.length).keys()] },
+                trial_duration: 5000 //5000
+            }
+            var ReadAllResponses = {
+                timeline: [ ReadOneResponse, BlinkThatResponse ],
+                timeline_variables: ListOfBlinkingItems,
+                conditional_function: function() {if(currentResponse++ < nBlinkingItems) {return true;} else {return false;}}
+            }
+            var GatherResponses = {
+                // jsPsych.data collects everything, so needs to filter
+                // the odd button presses on the last 2*nBlinkingItems events
+                type: jsPsychCallFunction,
+                func: function(data) {
+                    tempAcc = false;
+                    var stem = jsPsych.data.get().filter({trial_type: 'html-button-response'}).last(2*nBlinkingItems);
+                    var responses = stem.select('button_pressed').values.filter((a,i)=>i%2===0);
+                    responses = responses.map(Number);
+			// console.log("test-a: ", responses )
+                    var correct   = [...Array(nBlinkingItems).keys()];
+			// console.log("test-b: ", correct)
+                    var acc       = responses.every(function(value, index) { return value === correct[index]});
+                    var rts = stem.select('rt').values.filter((a,i)=>i%2===0)
+                    if (acc) {correctAttempts = correctAttempts + 1; practiceScore = practiceScore + 1};
+                    currentCycle = currentCycle + 1;
+                    tempAcc = acc
+
+                },
+                on_finish: function(data){
+                    data.accuracy = tempAcc;
+                }
+            }
+
+            var RunOnePractice = {
+                timeline: [ SetnBlinkingItems,
+                            GeneratePositions,
+                            WaitInterTrialDuration,
+                            ShowFixation,
+                            ShowAllItems,
+                            WaitPreBlinkDuration,
+                            BlinkAllItems,
+                            WaitPostBlinkDuration,
+                            StartResponding,
+                            ReadAllResponses,
+                            GatherResponses // don't forget to save...
+                        ],
+                randomize_order:    false,
+                repetitions:        1,
+            }
+
+            var PracticeFeedback = {
+                type: jsPsychHtmlButtonResponse,
+                stimulus: function(){
+                    if (tempAcc){
+                        return '<p><span style="font-size: 36px; color: rgb(65, 168, 95);">Correct!</span></p>';
+                    }
+                    return '<p><span style="font-size: 36px; color: rgb(209, 72, 65);">Incorrect</span></p>';
+                },
+                choices: ['Continue']
+            }
+
+            var RunPracticeTrials = {
+                timeline:           [ RunOnePractice, PracticeFeedback ],
+                timeline_variables: practiceSequences,
+                randomize_order:    sequenceRandomOrder,
+                repetitions:        2,
+            }
+
+            //Only played if the participant doesn't get both practices correct
+            var ExtraPractice = {
+                timeline: [ SetnBlinkingItems,
+                            GeneratePositions,
+                            WaitInterTrialDuration,
+                            ShowFixation,
+                            ShowAllItems,
+                            WaitPreBlinkDuration,
+                            BlinkAllItems,
+                            WaitPostBlinkDuration,
+                            StartResponding,
+                            ReadAllResponses,
+                            GatherResponses // don't forget to save...
+                        ],
+                randomize_order:    false,
+                repetitions:        1,
+            }
+
+            var ExtraPracticeFeedback = {
+                type: jsPsychHtmlButtonResponse,
+                stimulus: function(){
+                    if (tempAcc){
+                        return '<p><span style="font-size: 36px; color: rgb(65, 168, 95);">Correct!</span></p>';
+                    }
+                    return '<p><span style="font-size: 36px; color: rgb(209, 72, 65);">Not quite, try again</span></p>';
+                },
+                choices: ['Continue']
+            }
+
+            // var IncorrectExtraPractice = {
+            //     type: 'html-button-response',
+            //     stimulus: '<h3>Not quite, try again</h3>',
+            //     choices: ['Continue']
+            // }
+
+            var RunExtraPractice = {
+                timeline:           [ ExtraPractice, ExtraPracticeFeedback ],
+                timeline_variables: practiceSequences,
+                randomize_order:    sequenceRandomOrder,
+                conditional_function: function(){
+                    if (correctAttempts == 2){
+                        correctAttempts = 0;
+                        currentCycle = 0;
+                        CurrentTrial = CurrentTrial + 1;
+                        return false
+                    }
+                    practiceScore = 0
+                    return true
+                },
+                loop_function: function(){
+                    if (practiceScore >= 1){
+                        correctAttempts = 0;
+                        currentCycle = 0;
+                        return false
+                    };
+                    CurrentTrial = CurrentTrial - 1;
+                    return true
+                }
+            }
+
+            var RunOneTrial = {
+                timeline: [ SetnBlinkingItems,
+                            GeneratePositions,
+                            WaitInterTrialDuration,
+                            ShowFixation,
+                            ShowAllItems,
+                            WaitPreBlinkDuration,
+                            BlinkAllItems,
+                            WaitPostBlinkDuration,
+                            StartResponding,
+                            ReadAllResponses,
+                            GatherResponses // don't forget to save...
+                        ],
+                randomize_order:    false,
+                repetitions:        sequenceRepetition,
+                conditional_function: function(){
+                    //var data = jsPsych.data.get().last(1).values()[0];
+                    // console.log('currentcycle', currentCycle, 'correctAttempts', correctAttempts)
+                    if (currentCycle == 2){
+                        currentCycle = 0;
+                        if (correctAttempts == 0){
+                            currentCycle = 2;
+                            // console.log('fail here');
+                            return false;
+                        }
+                        else{correctAttempts = 0}
+                    }
+                    // console.log("don't fail here")
+                    return true;
+                }
+            }
+
+            var RunAllTrials = {
+                timeline:           [ RunOneTrial ],
+                timeline_variables: sequenceLengths,
+                randomize_order:    sequenceRandomOrder
+            }
+
+            timeline = [ FullScreenOn, SayWelcome, practice_instructions, RunPracticeTrials, RunExtraPractice, instructions_main, RunAllTrials, FullScreenOff, SayBye ]
+            jsPsych.run(timeline);
+
+});
+
+        //Jatos Code
+        //     let completeTimelineProcedure = {
+        //       timeline: timeline,
+        //     //   preload_audio: audio, // better to load all external files before the experiment starts
+        //         // preload_images: images,
+        //       data: {
+        //         urlparameters_and_consent: function() {
+        //           return jatos.studySessionData;
+        //         },
+        //         prolific_id: function() {
+        //           return jatos.studySessionData.PROLIFIC_PID
+        //         },
+        //         prolific_study_id: function() {
+        //           return jatos.studySessionData.STUDY_ID
+        //         },
+        //         prolific_session_id: function() {
+        //           return jatos.studySessionData.SESSION_ID
+        //         },
+        //       },
+        //     }
+        //     completeTimeline = [completeTimelineProcedure]
+
+        // /* start the experiment */
+        //       jsPsych.init( {
+        //         timeline: completeTimeline,
+        //         on_finish: function() {
+        //           var resultJson = jsPsych.data.get().json();
+        //           jatos.submitResultData(resultJson,jatos.startNextComponent);
+        //         },
+        //       });
+        //     });
+
+        </script>
+    </body>
+</html>

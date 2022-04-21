@@ -1,8 +1,16 @@
-var jsPsychAudioImageButtonResponse = (function (jspsych) {
+// Modifications:
+// - Removed code to build buttons.
+// - trial.response is not an integer, so removed parseInt
+// - Added button_html to trial data.
+// - Added border after image is selected
+
+
+
+var jsPsychAudioImageButtonResponseNoFeedback = (function (jspsych) {
   'use strict';
 
   const info = {
-      name: "audio-image-button-response",
+      name: "audio-image-button-response-no-feedback",
       parameters: {
           /** The audio to be played. */
           stimulus: {
@@ -72,14 +80,14 @@ var jsPsychAudioImageButtonResponse = (function (jspsych) {
       },
   };
   /**
-   * **audio-image-button-response**
+   * **audio-button-response**
    *
    * jsPsych plugin for playing an audio file and getting a button response
    *
    * @author Kristin Diep
    * @see {@link https://www.jspsych.org/plugins/jspsych-audio-button-response/ audio-button-response plugin documentation on jspsych.org}
    */
-  class AudioImageButtonResponsePlugin {
+  class AudioImageButtonResponseNoFeedbackPlugin {
       constructor(jsPsych) {
           this.jsPsych = jsPsych;
       }
@@ -123,10 +131,21 @@ var jsPsychAudioImageButtonResponse = (function (jspsych) {
               if (!trial.response_allowed_while_playing && !trial.trial_ends_after_audio) {
                   this.audio.addEventListener("ended", enable_buttons);
               }
+
+              // MODIFICATION: Removed all building of image-buttons. This is instead done when the plugin is called, and added to the HTML here via button_html.
               //display buttons
               var html = '<div id="jspsych-audio-button-response-btngroup">';
               html += trial.button_html;
-              html += '</div>';
+              html += '<span class = "hidden_text" id = "reminder"> Please respond. </span>'
+              html += "</div>";
+
+              //MODIFICATION: hidden message becomes visible after 5 seconds
+              var hidden_message = null;
+              this.jsPsych.pluginAPI.setTimeout(()=> {
+                  hidden_message = document.getElementById("reminder"),
+                  hidden_message.classList.replace('hidden_text','visible_text')
+                }, 5000);
+
               //show prompt if there is one
               if (trial.prompt !== null) {
                   html += trial.prompt;
@@ -165,7 +184,9 @@ var jsPsychAudioImageButtonResponse = (function (jspsych) {
                   endTime = context.currentTime;
                   rt = Math.round((endTime - startTime) * 1000);
               }
-              response.button = parseInt(choice);
+
+              // MODIFICATION: RESPONSE IS NOT AN INTEGER
+              response.button = choice;
               response.rt = rt;
               // disable all the buttons after a response
               disable_buttons();
@@ -192,30 +213,35 @@ var jsPsychAudioImageButtonResponse = (function (jspsych) {
                   rt: response.rt,
                   stimulus: trial.stimulus,
                   response: response.button,
-                  button_html: button_html,
-              };
-              // clear the display
-              display_element.innerHTML = "";
-              // move on to the next trial
-              this.jsPsych.finishTrial(trial_data);
-              trial_complete();
+
+                  // MODIFICATION: ADDED button_html TO TRIAL DATA
+                  button_html: trial.button_html,
+            };
+              // MODIFICATION: SHOW ITEM SELECTED BY HIGHLIGHTING CLICKED IMAGE WITH BLUE BORDER
+              var clicked_image = null;
+              var nodes = document.querySelectorAll("img.unselected");
+                for (var i = 0; i < nodes.length; i++) {
+                  if (nodes[i].getAttribute("data-choice") == response.button) {
+                    clicked_image = nodes[i];
+                  }
+                }
+              clicked_image.classList.replace('unselected','selected')
+              this.jsPsych.pluginAPI.setTimeout(() => {
+                  // clear the display
+                  display_element.innerHTML = "";
+                  // move on to the next trial
+                  this.jsPsych.finishTrial(trial_data);
+                  trial_complete();
+              }, 1000); // CHANGE TIME-LENGTH OF FEEDBACK HERE
+
           };
+
           function button_response(e) {
               var choice = e.currentTarget.getAttribute("data-choice"); // don't use dataset for jsdom compatibility
-              var btns = document.querySelectorAll('.jspsych-audio-button-response-button');
-
-              for (var i = 0; i < btns.length; i++) {
-                if (btns[i] == e.currentTarget) {
-                  btns[i].classList.replace('unselected','selected');
-                }
-                else {
-                  btns[i].classList.replace('selected','unselected');
-                }
-              }
               after_response(choice);
           }
           function disable_buttons() {
-              var btns = document.querySelectorAll(".jspsych-audio-image-button-response-button");
+              var btns = document.querySelectorAll(".jspsych-audio-button-response-button");
               for (var i = 0; i < btns.length; i++) {
                   var btn_el = btns[i].querySelector("button");
                   if (btn_el) {
@@ -225,7 +251,7 @@ var jsPsychAudioImageButtonResponse = (function (jspsych) {
               }
           }
           function enable_buttons() {
-              var btns = document.querySelectorAll(".jspsych-audio-image-button-response-button");
+              var btns = document.querySelectorAll(".jspsych-audio-button-response-button");
               for (var i = 0; i < btns.length; i++) {
                   var btn_el = btns[i].querySelector("button");
                   if (btn_el) {
@@ -280,8 +306,8 @@ var jsPsychAudioImageButtonResponse = (function (jspsych) {
           });
       }
   }
-  AudioImageButtonResponsePlugin.info = info;
+  AudioImageButtonResponseNoFeedbackPlugin.info = info;
 
-  return AudioImageButtonResponsePlugin;
+  return AudioImageButtonResponseNoFeedbackPlugin;
 
 })(jsPsychModule);

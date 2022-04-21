@@ -1,11 +1,21 @@
-var jsPsychHtmlAudioResponse = (function (jspsych) {
+// Modifications:
+// - Play "This is a..." at beginning of trial
+// - Modify Done Button to appear like button in audio-button-response plugin
+
+
+var jsPsychHtmlAudioResponseNoFeedback = (function (jspsych) {
   'use strict';
 
   const info = {
-      name: "html-audio-response",
+      name: "html-audio-response-no-feedback",
       parameters: {
           /** The HTML string to be displayed */
           stimulus: {
+              type: jspsych.ParameterType.HTML_STRING,
+              default: undefined,
+          },
+          //MODIFICATION:** The audio file to be played */
+          audio_stimulus: {
               type: jspsych.ParameterType.HTML_STRING,
               default: undefined,
           },
@@ -51,7 +61,7 @@ var jsPsychHtmlAudioResponse = (function (jspsych) {
    * @author Josh de Leeuw
    * @see {@link https://www.jspsych.org/plugins/jspsych-html-audio-response/ html-audio-response plugin documentation on jspsych.org}
    */
-  class HtmlAudioResponsePlugin {
+  class HtmlAudioResponseNoFeedbackPlugin {
       constructor(jsPsych) {
           this.jsPsych = jsPsych;
           this.rt = null;
@@ -61,6 +71,29 @@ var jsPsychHtmlAudioResponse = (function (jspsych) {
           this.recorder = this.jsPsych.pluginAPI.getMicrophoneRecorder();
           this.setupRecordingEvents(display_element, trial);
           this.startRecording();
+
+          // MODIFICATION: PLAY "THIS IS A..." AUDIO AT TRIAL START
+          var context = this.jsPsych.pluginAPI.audioContext();
+          var startTime;
+          this.jsPsych.pluginAPI
+              .getAudioBuffer(trial.audio_stimulus)
+              .then((buffer) => {
+                  if (context !== null) {
+                      this.audio = context.createBufferSource();
+                      this.audio.buffer = buffer;
+                      this.audio.connect(context.destination);
+
+                      startTime = performance.now();
+                      startTime = context.currentTime;
+                      this.audio.start(startTime);
+                  }
+                  else {
+                      this.audio = buffer;
+                      this.audio.currentTime = 0;
+                      this.audio.play();
+                  }
+              }).catch((err) => {console.error(err)})
+
       }
       showDisplay(display_element, trial) {
           const ro = new ResizeObserver((entries, observer) => {
@@ -69,12 +102,28 @@ var jsPsychHtmlAudioResponse = (function (jspsych) {
               //observer.disconnect();
           });
           ro.observe(display_element);
-          let html = `<div id="jspsych-html-audio-response-stimulus">${trial.stimulus}</div>`;
+          //MODIFICATION: ADD REMINDER AT TOP
+          let html = '<span class= "reminder_text"" > Please repeat the name aloud </span>';
+          html += `<div id="jspsych-html-audio-response-stimulus">${trial.stimulus}</div>`;
+
+          // MODIFICATION: MAKE DONE BUTTON LOOK LIKE BUTTON IN AUDIO-BUTTON-RESPONSE PLUGIN
           if (trial.show_done_button) {
-              html += `<p><button class="jspsych-btn" id="finish-trial">${trial.done_button_label}</button></p>`;
+              html += `
+                        <div class="lower_btn" style="cursor: pointer; display: inline-block; margin:0px 8px">
+                          <button class="jspsych-btn" id="finish-trial">${trial.done_button_label}</button>
+                        </div>
+                      `;
           }
+          // MODIFICATION: REMINDER AFTER 5 SEC
+          html += '<br> <span class = "hidden_text" id = "reminder"> Please respond. </span>';
           display_element.innerHTML = html;
+          var hidden_message = null;
+          this.jsPsych.pluginAPI.setTimeout(()=> {
+              hidden_message = document.getElementById("reminder"),
+              hidden_message.classList.replace('hidden_text','visible_text')
+            }, 5000);
       }
+
       hideStimulus(display_element) {
           const el = display_element.querySelector("#jspsych-html-audio-response-stimulus");
           if (el) {
@@ -83,7 +132,11 @@ var jsPsychHtmlAudioResponse = (function (jspsych) {
       }
       addButtonEvent(display_element, trial) {
           const btn = display_element.querySelector("#finish-trial");
-          if (btn) {
+
+          // MODIFICATION: INITIALLY DISABLE DONE BUTTON, ENABLE AFTER SPECIFIED TIME
+          btn.disabled = true;
+          setTimeout(() => {
+              btn.disabled = false;
               btn.addEventListener("click", () => {
                   const end_time = performance.now();
                   this.rt = Math.round(end_time - this.stimulus_start_time);
@@ -96,7 +149,8 @@ var jsPsychHtmlAudioResponse = (function (jspsych) {
                       }
                   });
               });
-          }
+          }, 2000) // CHANGE TIME-LENGTH OF DISABLED BUTTON HERE
+
       }
       setupRecordingEvents(display_element, trial) {
           this.data_available_handler = (e) => {
@@ -180,6 +234,7 @@ var jsPsychHtmlAudioResponse = (function (jspsych) {
           this.recorder.removeEventListener("dataavailable", this.data_available_handler);
           this.recorder.removeEventListener("start", this.start_event_handler);
           this.recorder.removeEventListener("stop", this.stop_event_handler);
+
           // kill any remaining setTimeout handlers
           this.jsPsych.pluginAPI.clearAllTimeouts();
           // gather the data to store for the trial
@@ -195,14 +250,15 @@ var jsPsychHtmlAudioResponse = (function (jspsych) {
           else {
               URL.revokeObjectURL(this.audio_url);
           }
-          // clear the display
-          display_element.innerHTML = "";
-          // move on to the next trial
-          this.jsPsych.finishTrial(trial_data);
+          setTimeout(() => {
+              display_element.innerHTML = "";
+              this.jsPsych.finishTrial(trial_data);
+          }, 0) // CHANGE TIME-LENGTH OF WHEN TO END TRIAL HERE (E.G. AFTER LENGTH OF LONGEST AUDIO FILE) -- THIS IS A CONSTANT REGARDLESS OF LENGTH OF AUDIO FILE!
+
       }
   }
-  HtmlAudioResponsePlugin.info = info;
+  HtmlAudioResponseNoFeedbackPlugin.info = info;
 
-  return HtmlAudioResponsePlugin;
+  return HtmlAudioResponseNoFeedbackPlugin;
 
 })(jsPsychModule);
