@@ -14,8 +14,6 @@ jatos.onLoad(function() {
     },
   });
 
-
-
   // FUNCTION TO RANDOMIZE ORDER OF AN ARRAY IN PLACE
 
   function shuffle(array) {
@@ -458,17 +456,52 @@ jatos.onLoad(function() {
     },
   };
 
+  let final_test = {
+    type: jsPsychAudioImageButtonResponseNoFeedback,
+    stimulus: "media/audio/Click" + jsPsych.timelineVariable('sound') + ".flac",
+    choices: "",
+    button_html: function() {
+      let image_list = jsPsych.timelineVariable('image_list')
 
-  // Final BLOCK
+      // Add target image to grid of nine images
+      let html_target_image = "<img class = 'jspsych-audio-button-response-button unselected' style = 'cursor: pointer;' id = 'target' data-choice = '{image: " + image_list[jsPsych.timelineVariable('index')] + "}' src = '" + image_list[jsPsych.timelineVariable('index')] + "'>";
+      let html_image_list = [html_target_image];
+
+      // Add each of the eight foil images to grid of nine images
+      for (let i = 0; i < image_list.length; i++) {
+        if (i != jsPsych.timelineVariable('index')) {
+          let html_foil_image = "<img class = 'jspsych-audio-button-response-button unselected' style = 'cursor: pointer;' id = 'foil' data-choice = '{image: " + image_list[i] + "}' src = '" + image_list[i] + "'>";
+          html_image_list.push(html_foil_image);
+        }
+      }
+
+      shuffle(html_image_list);
+
+      // Create HTML for grid
+      let html_images_string = html_image_list.join("");
+      return "<div class = 'grid'>" + html_images_string + "</div>";
+    },
+    trial_duration: null, // ADD TRIAL DURATION??
+    response_allowed_while_playing: false,
+    data: {
+      task: 'final',
+      block: jsPsych.timelineVariable('type'),
+      image: jsPsych.timelineVariable('image_list')[jsPsych.timelineVariable('index')],
+      word: jsPsych.timelineVariable('sound'),
+    },
+  };
+
+
+  // Final Test - testing each target once, pulling 3 stimuli from each block type
   var trial_structure = function(){
     var all_stims = []
     var targets = [
       {type_num: 0, type: "sem", indicies: _.range(8)},
       {type_num: 1, type: "neither", indicies: _.range(8)},
       {type_num: 2, type: "phon", indicies: _.range(8)}]
-
-    var all_three_images = [sem_image_list, unrel_image_list, phon_image_list]
-    var all_three_words = [sem_word_list, unrel_word_list, phon_word_list]
+    console.log(targets)
+    var all_image_list = [sem_image_list, unrel_image_list, phon_image_list]
+    var all_word_list = [sem_word_list, unrel_word_list, phon_word_list]
 
     var original_foils = _.cloneDeep(targets)
     var foils = _.cloneDeep(original_foils)
@@ -494,8 +527,8 @@ jatos.onLoad(function() {
         this_target = this_type_array['indicies'].splice(0,1)
         this_type_num = this_type_array['type_num']
 
-        target_image = all_three_images[this_type_num][this_target]
-        target_word = all_three_words[this_type_num][this_target]
+        target_image = all_image_list[this_type_num][this_target]
+        target_word = all_word_list[this_type_num][this_target]
 
         this_foils = [];
 
@@ -532,13 +565,13 @@ jatos.onLoad(function() {
         target_foil_index = image_list.findIndex((element) => element == target_image)
 
         all_stims.push({"index": target_foil_index, "images":image_list, "sound": target_word, "type": this_type})
-        //[”index” : index, “images”: image_list, “sound”: target_word, “type”: type]
       }
       foils = _.cloneDeep(original_foils)
     }
     return all_stims
   }
 
+  var final_block_stims = trial_structure()
 
   // BEGIN EXPERIMENT
 
@@ -851,8 +884,15 @@ jatos.onLoad(function() {
       training_directions, unrel_training_trials, test_directions, unrel_test_trials],
   };
 
+  // Final block
+  let final_test_trials = {
+    timeline: [fixation, final_test],
+    timeline_variables: final_block_stims,
+    andomize_order: false,
+  }
+
   // CREATE AND RUN TIMELINE
-  let timeline = [welcome, loop_mic_check]
+  let timeline = [welcome, loop_mic_check, final_test_trials]
   let blocks = [sem_block, phon_block, unrel_block]
   shuffle(blocks);
   timeline.push(blocks[0], break_directions, blocks[1], break_directions, blocks[2])
