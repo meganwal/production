@@ -506,6 +506,9 @@ jatos.onLoad(function() {
         }
         this_foils = [];
 
+        var image_list;
+        image_list.push(target_image)
+
         for(const this_foil_type of types) {
 
           if(this_foil_type == this_type) {
@@ -526,6 +529,7 @@ jatos.onLoad(function() {
             tmp_foils = _.find(foils, ['type', this_foil_type])
             this_foils.push(tmp_foils['indicies'].splice(0,3))
           }
+
         }
 
         all_stims.push({target:_.first(this_target), foils: _.flatten(this_foils)})
