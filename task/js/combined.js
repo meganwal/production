@@ -466,7 +466,7 @@ jatos.onLoad(function() {
     var targets = [
       {type: "sem", indicies: _.range(8)},
       {type: "neither", indicies: _.range(8)},
-      {type: "phon", indicies: _.range(8)}
+      {type: "phon", indicies: _.range(8)}]
 
     var original_foils = _.cloneDeep(targets)
     var foils = _.cloneDeep(original_foils)
@@ -488,8 +488,22 @@ jatos.onLoad(function() {
 
         this_type_array =  _.find(targets, ['type', this_type])
         this_target = this_type_array['indicies'].splice(0,1)
-        var target_image =
-        var target_word = 
+        var target_image;
+        var target_word;
+        switch (this_type) {
+          case 'sem':
+            target_image = sem_image_list[i]
+            target_word = sem_word_list[i]
+            break;
+          case 'unrel':
+            target_image = unrel_image_list[i]
+            target_word = unrel_word_list[i]
+            break;
+          case 'phon':
+            target_image = phon_image_list[i]
+            target_word = phon_word_list[i]
+            break;
+        }
         this_foils = [];
 
         for(const this_foil_type of types) {
@@ -515,6 +529,7 @@ jatos.onLoad(function() {
         }
 
         all_stims.push({target:_.first(this_target), foils: _.flatten(this_foils)})
+        //[”index” : index, “images”: image_list, “sound”: target_word, “type”: type]
       }
       foils = _.cloneDeep(original_foils)
     }
