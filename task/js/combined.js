@@ -459,14 +459,16 @@ jatos.onLoad(function() {
   };
 
 
-
   // Final BLOCK
   var trial_structure = function(){
     var all_stims = []
     var targets = [
-      {type: "sem", indicies: _.range(8)},
-      {type: "neither", indicies: _.range(8)},
-      {type: "phon", indicies: _.range(8)}]
+      {type_num: 0, type: "sem", indicies: _.range(8)},
+      {type_num: 1, type: "neither", indicies: _.range(8)},
+      {type_num: 2, type: "phon", indicies: _.range(8)}]
+
+    var all_three_images = [sem_image_list, unrel_image_list, phon_image_list]
+    var all_three_words = [sem_word_list, unrel_word_list, phon_word_list]
 
     var original_foils = _.cloneDeep(targets)
     var foils = _.cloneDeep(original_foils)
@@ -482,31 +484,22 @@ jatos.onLoad(function() {
     var tmp_foils;
     var tmp_foil_images;
     var target_idx;
+    var target_image;
+    var target_word;
 
     for (var i = 0; i < 9; i++) {
       for(const this_type of types) {
 
         this_type_array =  _.find(targets, ['type', this_type])
         this_target = this_type_array['indicies'].splice(0,1)
-        var target_image;
-        var target_word;
-        switch (this_type) {
-          case 'sem':
-            target_image = sem_image_list[i]
-            target_word = sem_word_list[i]
-            break;
-          case 'unrel':
-            target_image = unrel_image_list[i]
-            target_word = unrel_word_list[i]
-            break;
-          case 'phon':
-            target_image = phon_image_list[i]
-            target_word = phon_word_list[i]
-            break;
-        }
+        this_type_num = this_type_array['type_num']
+
+        target_image = all_three_images[this_type_num][this_target]
+        target_word = all_three_words[this_type_num][this_target]
+
         this_foils = [];
 
-        var image_list;
+        var image_list = [];
         image_list.push(target_image)
 
         for(const this_foil_type of types) {
@@ -517,22 +510,28 @@ jatos.onLoad(function() {
             target_idx = tmp_foil_images.findIndex((element) => element == this_target)
 
             if(target_idx == 0) {
-              this_foils.push(tmp_foil_images.splice(1,2))
+              this_foils.push(all_image_list[this_type_num][tmp_foil_images.splice(1,2)])
             } else if(target_idx == 1) {
-              this_foils.push(tmp_foil_images.splice(0,1))
-              this_foils.push(tmp_foil_images.splice(1,1))
+              this_foils.push(all_image_list[this_type_num][tmp_foil_images.splice(0,1)])
+              this_foils.push(all_image_list[this_type_num][tmp_foil_images.splice(1,1)])
             } else {
-              this_foils.push(tmp_foil_images.splice(0,2))
+              this_foils.push(all_image_list[this_type_num][tmp_foil_images.splice(0,2)])
             }
 
           } else {
-            tmp_foils = _.find(foils, ['type', this_foil_type])
-            this_foils.push(tmp_foils['indicies'].splice(0,3))
-          }
 
+            tmp_foils = _.find(foils, ['type', this_foil_type])
+
+            this_foils.push(all_image_list[this_type_num][tmp_foil_images.splice(0,3)])
+          }
         }
 
-        all_stims.push({target:_.first(this_target), foils: _.flatten(this_foils)})
+        image_list.push(_.flatten(this_foils))
+        image_list = _.shuffle(image_list)
+
+        target_foil_index = image_list.findIndex((element) => element == target_image)
+
+        all_stims.push({"index": target_foil_index, "images":image_list, "sound": target_word, "type": this_type})
         //[”index” : index, “images”: image_list, “sound”: target_word, “type”: type]
       }
       foils = _.cloneDeep(original_foils)
