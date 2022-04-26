@@ -78,9 +78,21 @@ jatos.onLoad(function() {
   // temporary order, replace with JATOS Batch Session variable
   let condition = 3
 
-  let sem_index_list = [{ index: 0, block: 'semantic' }, { index: 1, block: 'semantic' }, { index: 2, block: 'semantic' }, { index: 3, block: 'semantic' }, { index: 4, block: 'semantic' }, { index: 5, block: 'semantic' }, { index: 6, block: 'semantic' }, { index: 7, block: 'semantic' }, { index: 8, block: 'semantic' }]
-  let phon_index_list = [{ index: 0, block: 'phonological' }, { index: 1, block: 'phonological' }, { index: 2, block: 'phonological' }, { index: 3, block: 'phonological' }, { index: 4, block: 'phonological' }, { index: 5, block: 'phonological' }, { index: 6, block: 'phonological' }, { index: 7, block: 'phonological' }, { index: 8, block: 'phonological' }]
-  let unrel_index_list = [{ index: 0, block: 'unrelated' }, { index: 1, block: 'unrelated' }, { index: 2, block: 'unrelated' }, { index: 3, block: 'unrelated' }, { index: 4, block: 'unrelated' }, { index: 5, block: 'unrelated' }, { index: 6, block: 'unrelated' }, { index: 7, block: 'unrelated' }, { index: 8, block: 'unrelated' }]
+  let sem_index_list = [{ index: 0, block: 'semantic' },
+  { index: 1, block: 'semantic' },{ index: 2, block: 'semantic' },
+  { index: 3, block: 'semantic' }, { index: 4, block: 'semantic' },
+  { index: 5, block: 'semantic' }, { index: 6, block: 'semantic' },
+   { index: 7, block: 'semantic' }, { index: 8, block: 'semantic' }]
+  let phon_index_list = [{ index: 0, block: 'phonological' },
+  { index: 1, block: 'phonological' }, { index: 2, block: 'phonological' },
+  { index: 3, block: 'phonological' }, { index: 4, block: 'phonological' },
+  { index: 5, block: 'phonological' }, { index: 6, block: 'phonological' },
+  { index: 7, block: 'phonological' }, { index: 8, block: 'phonological' }]
+  let unrel_index_list = [{ index: 0, block: 'unrelated' },
+  { index: 1, block: 'unrelated' }, { index: 2, block: 'unrelated' },
+  { index: 3, block: 'unrelated' }, { index: 4, block: 'unrelated' },
+  { index: 5, block: 'unrelated' }, { index: 6, block: 'unrelated' },
+  { index: 7, block: 'unrelated' }, { index: 8, block: 'unrelated' }]
 
 
   // BUILD EXPERIMENTAL TRIALS
@@ -499,7 +511,6 @@ jatos.onLoad(function() {
       {type_num: 0, type: "sem", indicies: _.range(8)},
       {type_num: 1, type: "neither", indicies: _.range(8)},
       {type_num: 2, type: "phon", indicies: _.range(8)}]
-    console.log(targets)
     var all_image_list = [sem_image_list, unrel_image_list, phon_image_list]
     var all_word_list = [sem_word_list, unrel_word_list, phon_word_list]
 
@@ -550,7 +561,6 @@ jatos.onLoad(function() {
             } else {
               this_foils.push(all_image_list[this_type_num][tmp_foil_images.splice(0,2)])
             }
-
           } else {
 
             tmp_foils = _.find(foils, ['type', this_foil_type])
@@ -733,6 +743,19 @@ jatos.onLoad(function() {
     stimulus: `
               <div class = "instructions_text">
                 <p>You may now take a pause before continuing the next set of images.</p>
+                <p>Press "Continue" to proceed.</p>
+              </div>
+              `,
+    choices: ['Continue'],
+  }
+
+  // Break Directions
+  let final_trial_directions = {
+    type: jsPsychHtmlButtonResponse,
+    stimulus: `
+              <div class = "instructions_text">
+                <p>Now all three of the sets you encountered will be combined.</p>
+                <p>You will see a grid of nine pictures and will be told to <b> click on </b> one of the images.</p>
                 <p>Press "Continue" to proceed.</p>
               </div>
               `,
