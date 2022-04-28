@@ -508,7 +508,7 @@ jatos.onLoad(function() {
     var all_stims = []
     var targets = [
       {type_num: 0, type: "sem", indicies: _.range(8)},
-      {type_num: 1, type: "neither", indicies: _.range(8)},
+      {type_num: 1, type: "unrel", indicies: _.range(8)},
       {type_num: 2, type: "phon", indicies: _.range(8)}]
     var all_image_list = [sem_image_list, unrel_image_list, phon_image_list]
     var all_word_list = [sem_word_list, unrel_word_list, phon_word_list]

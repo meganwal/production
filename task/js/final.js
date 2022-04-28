@@ -3,10 +3,18 @@
 let jsPsych = initJsPsych({
   on_finish: function() {
     let resultJson = jsPsych.data.get().json();
-    jatos.submitResultData(resultJson);
-    jatos.startNextComponent();
+    // jatos.submitResultData(resultJson);
+    // jatos.startNextComponent();
   },
 });
+
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    let j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+
 
 // CODE TO GENERATE SEMANTIC, PHONOLOGICAL, AND UNRELATED IMAGE/WORD LISTS
 var sem_image_1 = ["media/images/bird1.png", "media/images/bird2.png",
@@ -130,9 +138,9 @@ let final_test = {
   var trial_structure = function(){
     var all_stims = []
     var targets = [
-      {type_num: 0, type: "sem", indicies: _.range(8)},
-      {type_num: 1, type: "neither", indicies: _.range(8)},
-      {type_num: 2, type: "phon", indicies: _.range(8)}]
+      {type_num: 0, type: "sem", indicies: _.range(9)},
+      {type_num: 1, type: "neither", indicies: _.range(9)},
+      {type_num: 2, type: "phon", indicies: _.range(9)}]
     var all_image_list = [sem_image_list, unrel_image_list, phon_image_list]
     var all_word_list = [sem_word_list, unrel_word_list, phon_word_list]
 
@@ -173,26 +181,38 @@ let final_test = {
           if(this_foil_type == this_type) {
             tmp_foils = _.find(foils, ['type', this_foil_type])
             tmp_foil_images = tmp_foils['indicies']
+
             target_idx = tmp_foil_images.findIndex((element) => element == this_target)
 
             if(target_idx == 0) {
               this_foils.push(all_image_list[this_type_num][tmp_foil_images.splice(1,2)])
+              console.log("0")
+              console.log(this_type_num)
+              console.log(all_image_list[this_type_num][[0,1]])
+              console.log(this_foils)
             } else if(target_idx == 1) {
               this_foils.push(all_image_list[this_type_num][tmp_foil_images.splice(0,1)])
               this_foils.push(all_image_list[this_type_num][tmp_foil_images.splice(1,1)])
+              console.log("1")
+              console.log(this_type_num)
+              console.log(all_image_list[this_type_num][[0,1]])
+              console.log(this_foils)
             } else {
               this_foils.push(all_image_list[this_type_num][tmp_foil_images.splice(0,2)])
+              console.log("else")
+              console.log(this_type_num)
+              console.log(all_image_list)
+              console.log(all_image_list[this_type_num][[0,1]])
+              console.log(this_foils)
             }
           } else {
-
-            tmp_foils = _.find(foils, ['type', this_foil_type])
 
             this_foils.push(all_image_list[this_type_num][tmp_foil_images.splice(0,3)])
           }
         }
-
         image_list.push(_.flatten(this_foils))
         image_list = _.shuffle(image_list)
+
 
         target_foil_index = image_list.findIndex((element) => element == target_image)
 
@@ -215,5 +235,3 @@ let final_test_trials = {
 let timeline = [final_test_trials]
 
 jsPsych.run(timeline);
-
-});
