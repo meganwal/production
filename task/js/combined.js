@@ -105,7 +105,6 @@ jatos.onLoad(function() {
     trial_duration: 1000,
   };
 
-
   // Introduction trials - one image at a time with corresponding "This is a..." audio
   let introduction = {
     type: jsPsychHtmlAudioResponseNoFeedback,
@@ -340,7 +339,7 @@ jatos.onLoad(function() {
       }
 
       // Add target image to grid of nine images, with blue border
-      let html_target_image = "<img class = 'selected' id = 'target' target-word = '" + target_word + "' src = '" + image_list[jsPsych.timelineVariable('index')] + "'>";
+      let html_target_image = "<img class = 'unselected' id = 'target' target-word = '" + target_word + "' src = '" + image_list[jsPsych.timelineVariable('index')] + "'>";
       let html_image_list = [html_target_image];
 
       // Add each of the eight foil images to grid of nine images, with no border
@@ -907,12 +906,12 @@ jatos.onLoad(function() {
       training_directions, unrel_training_trials, test_directions, unrel_test_trials],
   };
 
-  // Final block
+    // Final block
   let final_test_trials = {
     timeline: [fixation, final_test],
     timeline_variables: final_block_stims,
-    andomize_order: false,
-  }
+    randomize_order: false,
+    }
 
   // CREATE AND RUN TIMELINE
   let timeline = [welcome, loop_mic_check, final_test_trials]

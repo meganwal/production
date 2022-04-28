@@ -145,7 +145,7 @@ var jsPsychAudioImageButtonResponseStudy = (function (jspsych) {
               this.jsPsych.pluginAPI.setTimeout(()=> {
                   target_selected = document.getElementById("target"),
                   target_selected.classList.replace('unselected','selected')
-                }, 1000);
+                }, 2000);
               // MODIFICATION: border changes to green
               this.jsPsych.pluginAPI.setTimeout(()=> {
                   target_selected.classList.replace('selected','correct')
@@ -156,7 +156,7 @@ var jsPsychAudioImageButtonResponseStudy = (function (jspsych) {
               this.jsPsych.pluginAPI.setTimeout(()=> {
                   hidden_message = document.getElementById("reminder"),
                   hidden_message.classList.replace('hidden_text','visible_text')
-                }, 6000);
+                }, 9000);
 
               //show prompt if there is one
               if (trial.prompt !== null) {
@@ -176,7 +176,7 @@ var jsPsychAudioImageButtonResponseStudy = (function (jspsych) {
                   startTime = context.currentTime;
                   this.jsPsych.pluginAPI.setTimeout(()=> {
                     this.audio.start(startTime);
-                  }, 1000);
+                  }, 2000);
               }
               else {
                   this.audio.play()

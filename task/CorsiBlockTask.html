@@ -29,14 +29,14 @@
     </head>
 
     <body>
-        <script>    
-            // ****************************** 
-            // *   Defining general stuff   * 
-            // ****************************** 
+        <script>
+            // ******************************
+            // *   Defining general stuff   *
+            // ******************************
         // jatos.onLoad(function() {
             console.log('Begining of the parameter definitions')
-            
-            // Experiment parameters 
+
+            // Experiment parameters
             var nItems              = 10       // total number of squares on the display
             // the sequence lengths to test the participant with, with the variable "OneSequenceLength"
             var sequenceLengths     = [{OneSequenceLength: 3},
@@ -48,38 +48,37 @@
             var sequenceRandomOrder = false   // true for "random" or false for "sequential"
             var sequenceRepetition  = 2       // how many times each length is tested
 
-            // Trial parameters 
+            // Trial parameters
             var InterTrialDuration   = 1000  // e.g., REF
             var FixationDuration     = 1000  // e.g., REF
-            var MouseToBeHidden      = true 
+            var MouseToBeHidden      = true
             var PreBlinkDuration     = 500  // e.g., REF
             var BlinkDuration        = 400  // e.g., REF
             var PostBlinkDuration    = 500  // e.g., REF
             var InterBlinkDuration   = 400  // e.g., REF
-            var RecallSignal         = 'audio/500hz-400ms.wav'
+            var RecallSignal         = 'media/digit_audio/500hz-400ms.wav'
             var RecallSignalDuration = 400
             var AcknowledgeDuration  = 200  // e.g., REF
-
             // Item parameters; assembled using makeItem
             var BackgroundColor   = "white"        // accept the HTML-defined colors
-            var TextColor         = "black"        					// 
+            var TextColor         = "black"        					//
             var OneItemShape      = "rect"             // one of the svg primitive
             var OneItemShownColor = "rgb(0,0,0)"       // black
             var OneItemBlinkColor = "rgb(127,127,127)" // gray
             var OneItemClickColor = "rgb(0,0,255)"     // blue
-            var OneItemSize       = 1/6               // proportion of the item relative to minscreen 
-            var OneItemMargin     = 1/50               // margin to leave empty around the item, relative to minscreen 
+            var OneItemSize       = 1/6               // proportion of the item relative to minscreen
+            var OneItemMargin     = 1/50               // margin to leave empty around the item, relative to minscreen
 
             console.log('End of the parameter definitions')
 
-            // ************************************************* 
-            // *   THIS IS IT! Everything beyond this point    * 
-            // *   will run nicely from the above definitions  * 
-            // ************************************************* 
+            // *************************************************
+            // *   THIS IS IT! Everything beyond this point    *
+            // *   will run nicely from the above definitions  *
+            // *************************************************
 
             // set the background color
-            document.body.style.backgroundColor = BackgroundColor; 
-            document.body.style.color = TextColor; 
+            document.body.style.backgroundColor = BackgroundColor;
+            document.body.style.color = TextColor;
 
             // these two lines convert the relative sizes into pixel sizes LEAVE UNCHANGED
             var OneItemSizePX     = Math.floor(OneItemSize * Math.min(screen.width, screen.height))
@@ -92,9 +91,9 @@
                 return(`<svg width="100%" height="100%"><${OneItemShape} width="100%" height="100%" style="fill:${color};stroke-width:0;"></svg>`);
             }
 
-            // Empty lists of items; are to be populated by PositionFunction 
-            var ListOfItems         = new Array(nItems); // the array is full length bcse jsPsych updates it too slow 
-            var ListOfBlinkingItems = new Array(nItems); // idem                                                      
+            // Empty lists of items; are to be populated by PositionFunction
+            var ListOfItems         = new Array(nItems); // the array is full length bcse jsPsych updates it too slow
+            var ListOfBlinkingItems = new Array(nItems); // idem
             var ListOfButtons       = new Array(nItems);
             var TemplateListOfRandx = [0.8805, 0.6169, 0.6703, 0.3838, 0.1165, 0.2007, 0.4460, 0.3906, 0.8197, 0.9777];
             var TemplateListOfRandy = [0.1575, 0.2113, 0.7113, 0.9379, 0.277, 0.619, 0.1705, 0.4672, 0.5612, 0.6086];
@@ -102,8 +101,8 @@
             var nBlinkingItems      = null;
             var ListOrder = ["7301245689", "1290345678", "9140235678", //Practices
                             "4961235780", "8350124679", "2913045678", "0478123569", //Main Trials
-                            "5201734689", "3469801257", "5410823679", "7194052368", 
-                            "3895106247", "2681573049", "5328769014", "8031594726", 
+                            "5201734689", "3469801257", "5410823679", "7194052368",
+                            "3895106247", "2681573049", "5328769014", "8031594726",
                             "4723106589", "5369178024", "6315720984","2413679805"];
 
 
@@ -122,17 +121,17 @@
                 }
                 return new_array;
             }
-            // Function that generates non-contiguous positions randomly.   
-            // This function can place the items anywhere on screen    
-            // while leaving an empty margin around the items.         
+            // Function that generates non-contiguous positions randomly.
+            // This function can place the items anywhere on screen
+            // while leaving an empty margin around the items.
             var PositionFunction = function() {
-                // console.log("begin of PositionFunction");    
-                // console.log("nBlinkingItems: ", nBlinkingItems); 
+                // console.log("begin of PositionFunction");
+                // console.log("nBlinkingItems: ", nBlinkingItems);
                 // console.log("Current Trial: ", CurrentTrial);
                 var i, j;
                 var x, y;
                 var NewXList = reorder(TemplateListOfRandx, str2array(ListOrder[CurrentTrial]))
-                var NewYList = reorder(TemplateListOfRandy, str2array(ListOrder[CurrentTrial])) 
+                var NewYList = reorder(TemplateListOfRandy, str2array(ListOrder[CurrentTrial]))
                 var tooclose = true;
                 ListOfButtons.length = 0;
 
@@ -141,8 +140,8 @@
                     tooclose = true;
                     while(tooclose) {
                         tooclose = false;
-                        x = Math.floor(NewXList[i] * 80 ); 
-                        y = Math.floor(NewYList[i] * 80 ); 
+                        x = Math.floor(NewXList[i] * 80 );
+                        y = Math.floor(NewYList[i] * 80 );
                         for (j= 0; j <i; j++) {
                             if ((x > ListOfItems[j].x - OneItemSizePX - OneItemMarginPX)&&
                                 (x < ListOfItems[j].x + OneItemSizePX + OneItemMarginPX)&&
@@ -163,12 +162,12 @@
                     // ListOfRands[i].x = rx;
                     // ListOfRands[i].y = ry;
 
-                    // they are also concatenated in a list of buttons 
+                    // they are also concatenated in a list of buttons
                     ListOfButtons.push(`<button type=button style = "position:absolute; `+
                             `margin-top: 0px; padding: 0px; background: black; width: 8%; height: 0; padding-bottom: 8%;`+
                             `border: none; left: ${x}%; top: ${y}%"></button>` );
                     if (i< nBlinkingItems) {
-                        //  the first nBlinkingItems are also kept in a shorter list 
+                        //  the first nBlinkingItems are also kept in a shorter list
                         ListOfBlinkingItems[i] = [];
                         ListOfBlinkingItems[i].x = x;
                         ListOfBlinkingItems[i].y = y;
@@ -176,7 +175,7 @@
                         ListOfBlinkingItems[i].ItemBLANK =  `<p style = "position:absolute; margin-top: 0em; left: ${x}%; top: ${y}%; background: blue; width: 8%; height: 0; padding-bottom: 8%;"></p>`;
                     }
                 }
-                // console.log("ending of PositionFunction");  
+                // console.log("ending of PositionFunction");
                 // console.log(ListOfRands);
                 CurrentTrial = CurrentTrial + 1;
             }
@@ -189,12 +188,12 @@
             var currentCycle = 0
             var practiceScore = 0
 
-            // ************************************************* 
-            // *   THIS IS IT! Everything beyond this point    * 
-            // *   will run nicely from the above definitions  * 
-            // ************************************************* 
+            // *************************************************
+            // *   THIS IS IT! Everything beyond this point    *
+            // *   will run nicely from the above definitions  *
+            // *************************************************
 
-            // mouse pointer functions 
+            // mouse pointer functions
             var HideMouse = function() { if (MouseToBeHidden) {
                     document.querySelector('head').insertAdjacentHTML('beforeend', '<style id="cursor-toggle"> html { cursor: none; } </style>');
                 }
@@ -204,11 +203,11 @@
                 }
             }
 
-            // *************************************** 
-            // *   Defining experiment-level events  * 
-            // *************************************** 
+            // ***************************************
+            // *   Defining experiment-level events  *
+            // ***************************************
 
-            // Toggle full screen on or off 
+            // Toggle full screen on or off
             var FullScreenOn = {
                 type: 'fullscreen',
                 message: "<p>The experiment will be in full screen mode once you click on the button.</p>",
@@ -219,63 +218,63 @@
                 type: 'fullscreen',
                 fullscreen_mode: false
             }
-            // the Welcome and Bye object descriptions 
+            // the Welcome and Bye object descriptions
             var SayWelcome = {
                 type: 'instructions',
-                pages: ['<p>You will see 10 blocks on the screen. On each trial, several blocks will light up on at the time.</p>'+ 
-                '<p>Your job is to remember their exact sequence. </p>' + 
+                pages: ['<p>You will see 10 blocks on the screen. On each trial, several blocks will light up on at the time.</p>'+
+                '<p>Your job is to remember their exact sequence. </p>' +
                 '<p>As soon as the sequence is finished, you will hear a beep. </p>' +
-                '<p>After the beep, you must repeat the sequence by clicking on the blocks in the same order they were presented.</p>' + 
+                '<p>After the beep, you must repeat the sequence by clicking on the blocks in the same order they were presented.</p>' +
                 '<p>Click "Next" to start.</p>' ],
-                show_clickable_nav: true, 
+                show_clickable_nav: true,
                 button_label_next: 'Next'
             }
 
             var practice_instructions = { // Instructions of Practice
             type: 'instructions',
-            pages: ['<p>We will first provide some practice.</p>'+ 
-            '<p>Remember to repeat the sequence in the exact same order that they appeared.</p>' + 
+            pages: ['<p>We will first provide some practice.</p>'+
+            '<p>Remember to repeat the sequence in the exact same order that they appeared.</p>' +
             '<p>Click "Next" to begin the practice.</p>' ],
-            show_clickable_nav: true, 
+            show_clickable_nav: true,
             button_label_next: 'Next'
             };
 
             var instructions_main = { // Instructions for main task
             type: 'instructions',
-            pages: ['<p>The practice is now complete, good job!</p>'+ 
-            '<p>You will now no longer receive feedback </p>' + 
+            pages: ['<p>The practice is now complete, good job!</p>'+
+            '<p>You will now no longer receive feedback </p>' +
             '<p>We will begin with a sequence length of three. You will get two tries for each sequence length.</p>' +
-            '<p>The sequence length will increase by one whenever you get at least one of the two sequences of equal length correct.</p>' + 
+            '<p>The sequence length will increase by one whenever you get at least one of the two sequences of equal length correct.</p>' +
             '<p>Click "Next" to begin.</p>' ],
-            show_clickable_nav: true, 
+            show_clickable_nav: true,
             button_label_next: 'Next'
             };
 
             var SayBye = {
                 type: 'instructions',
-                    pages: ['<p>You have completed this portion of the experiment.</p>'+ 
+                    pages: ['<p>You have completed this portion of the experiment.</p>'+
                     '<p>Please click on "End" to proceed to the next task.</p>'],
                     show_clickable_nav: true,
                     button_label_next: 'End'
                 };
 
 
-            // *************************************** 
-            // *     Defining trial-level events     * 
-            // *************************************** 
+            // ***************************************
+            // *     Defining trial-level events     *
+            // ***************************************
 
             var SetnBlinkingItems = {
                 type: 'call-function',
                 func: function() {
-                        nBlinkingItems =  jsPsych.timelineVariable("OneSequenceLength", true); 
-                        currentBlinkingItem = 0;  // counter that will count the number of blinks    
-                        currentResponse = 0;      // counter that will count the number of responses  
+                        nBlinkingItems =  jsPsych.timelineVariable("OneSequenceLength", true);
+                        currentBlinkingItem = 0;  // counter that will count the number of blinks
+                        currentResponse = 0;      // counter that will count the number of responses
                     },
             }
             var GeneratePositions = {
                 type: 'call-function',
                 func: PositionFunction
-             } 
+             }
             var WaitInterTrialDuration = {
                 type: 'html-keyboard-response-noerase',
                 stimulus: '',
@@ -346,8 +345,8 @@
                 type: 'html-button-response',
                 stimulus: '',
                 button_html: function() {
-                                var choice = jsPsych.data.get().last(1).values()[0].button_pressed; 
-                                if (choice !== null) {return ListOfButtons.concat(ListOfItems[choice].ItemACKNW);} 
+                                var choice = jsPsych.data.get().last(1).values()[0].button_pressed;
+                                if (choice !== null) {return ListOfButtons.concat(ListOfItems[choice].ItemACKNW);}
                                 else {return "";}
                             },
                 trial_duration: AcknowledgeDuration,
@@ -361,7 +360,7 @@
                 trial_duration: 5000 //5000
             }
             var ReadAllResponses = {
-                timeline: [ ReadOneResponse, BlinkThatResponse ], 
+                timeline: [ ReadOneResponse, BlinkThatResponse ],
                 timeline_variables: ListOfBlinkingItems,
                 conditional_function: function() {if(currentResponse++ < nBlinkingItems) {return true;} else {return false;}}
             }
@@ -391,12 +390,12 @@
 
             var RunOnePractice = {
                 timeline: [ SetnBlinkingItems,
-                            GeneratePositions, 
+                            GeneratePositions,
                             WaitInterTrialDuration,
-                            ShowFixation, 
-                            ShowAllItems, 
-                            WaitPreBlinkDuration, 
-                            BlinkAllItems, 
+                            ShowFixation,
+                            ShowAllItems,
+                            WaitPreBlinkDuration,
+                            BlinkAllItems,
                             WaitPostBlinkDuration,
                             StartResponding,
                             ReadAllResponses,
@@ -425,14 +424,14 @@
             }
 
             //Only played if the participant doesn't get both practices correct
-            var ExtraPractice = { 
+            var ExtraPractice = {
                 timeline: [ SetnBlinkingItems,
-                            GeneratePositions, 
+                            GeneratePositions,
                             WaitInterTrialDuration,
-                            ShowFixation, 
-                            ShowAllItems, 
-                            WaitPreBlinkDuration, 
-                            BlinkAllItems, 
+                            ShowFixation,
+                            ShowAllItems,
+                            WaitPreBlinkDuration,
+                            BlinkAllItems,
                             WaitPostBlinkDuration,
                             StartResponding,
                             ReadAllResponses,
@@ -486,12 +485,12 @@
 
             var RunOneTrial = {
                 timeline: [ SetnBlinkingItems,
-                            GeneratePositions, 
+                            GeneratePositions,
                             WaitInterTrialDuration,
-                            ShowFixation, 
-                            ShowAllItems, 
-                            WaitPreBlinkDuration, 
-                            BlinkAllItems, 
+                            ShowFixation,
+                            ShowAllItems,
+                            WaitPreBlinkDuration,
+                            BlinkAllItems,
                             WaitPostBlinkDuration,
                             StartResponding,
                             ReadAllResponses,

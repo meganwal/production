@@ -94,9 +94,13 @@ var jsPsychHtmlAudioResponseMod = (function (jspsych) {
           display_element.innerHTML = html;
           var hidden_message = null
           this.jsPsych.pluginAPI.setTimeout(()=> {
+              target_selected = document.getElementById("target"),
+              target_selected.classList.replace('unselected','selected')
+            }, 2000);
+          this.jsPsych.pluginAPI.setTimeout(()=> {
               hidden_message = document.getElementById("reminder"),
               hidden_message.classList.replace('hidden_text','visible_text')
-            }, 5000);
+            }, 7000);
       }
       hideStimulus(display_element) {
           const el = display_element.querySelector("#jspsych-html-audio-response-stimulus");
@@ -123,7 +127,7 @@ var jsPsychHtmlAudioResponseMod = (function (jspsych) {
                       }
                   });
               });
-          }, 1000) // CHANGE TIME-LENGTH OF DISABLED BUTTON HERE
+          }, 3000) // CHANGE TIME-LENGTH OF DISABLED BUTTON HERE
 
       }
       setupRecordingEvents(display_element, trial) {
@@ -255,7 +259,7 @@ var jsPsychHtmlAudioResponseMod = (function (jspsych) {
             setTimeout(() => {
                 display_element.innerHTML = "";
                 this.jsPsych.finishTrial(trial_data);
-            }, 2000) // CHANGE TIME-LENGTH OF WHEN TO END TRIAL HERE (E.G. AFTER LENGTH OF LONGEST AUDIO FILE) -- THIS IS A CONSTANT REGARDLESS OF LENGTH OF AUDIO FILE!
+            }, 3000) // CHANGE TIME-LENGTH OF WHEN TO END TRIAL HERE (E.G. AFTER LENGTH OF LONGEST AUDIO FILE) -- THIS IS A CONSTANT REGARDLESS OF LENGTH OF AUDIO FILE!
 
       }
   }
