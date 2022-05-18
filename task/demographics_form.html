@@ -1,0 +1,46 @@
+<!--
+
+    This is the HTML page for your Demographics Form.
+    This loads the JavaScript for that, 'demographics_form.js'.
+
+    A Demographics Form should be filled out before the start of the experiment by every participant.
+    'Parse_Raw_Data.py' for parsing your data creates a Participant Demographics file separate from your data. 
+    Pleases store this Participant Demographics file in your Synology project folder and Synology IRB project subfolder.
+
+    This corresponds to a single Component in JATOS, with 'demographics_form.html' being the 'HTML file path'. 
+    See 'Instructions for Running an Online Experiment: Creating a new study in JATOS' for more info.
+    Usually, this Component should sequentially come immediately after your Consent Form.
+
+    INSTRUCTIONS FOR MODIFICATION:
+
+    This file likely needs no modification.
+
+-->
+
+
+
+<!DOCTYPE html>
+<html lang = "en">
+    <head>
+        <title>CMU Psychology Experiment - Demographics Form</title>
+        <meta charset = "UTF-8">
+
+        <!-- These two JavaScript files are loaded for jsPsych and JATOS to function correctly. -->
+        <script src = "https://unpkg.com/jspsych@7.2.1"></script>
+        <script src = "jatos.js"></script>
+
+        <!-- These plugins are required for the functioning of the Demographics Form. -->
+        <script src = "https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.1.0"></script>
+        <script src = "https://unpkg.com/@jspsych/plugin-survey-multi-choice@1.1.0"></script>
+        <script src = "https://unpkg.com/@jspsych/plugin-survey-text@1.1.0"></script>
+
+        <!-- We load the Demographics Form JavaScript file here. -->
+        <script src = "js/demographics_form.js"></script>
+
+        <!-- We load CSS styling here. -->
+        <link href = "https://unpkg.com/jspsych@7.2.1/css/jspsych.css" rel="stylesheet" type="text/css" />
+        <link rel = "icon" href = "css/university.png" />
+    </head>
+    <body>
+    </body>
+</html>

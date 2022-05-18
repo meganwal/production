@@ -1,0 +1,61 @@
+<!--
+
+    This is the HTML page for your Headphones Check Lite.
+    This loads the JavaScript for that, 'headphones_check_lite.js'.
+
+    This corresponds to a single Component in JATOS, with 'headphones_check_lite.html' being the 'HTML file path'.
+    See 'Instructions for Running an Online Experiment: Creating a new study in JATOS' for more info.
+    Usually, this Component should sequentially come after your Demographics Form, before your experiment.
+
+    Participants must pass this screening to continue with your experiment.
+
+    They will see 3 trials with 2 images each. One of those images will be named. To pass, they must click on the named image in all 3 trials.
+    If they fail 1 time, they have a second chance with 3 new trials.
+    If they fail both attempts, they will be directed to the Debriefing page. They should still receive credit for their submission.
+
+    INSTRUCTIONS FOR MODIFICATION:
+
+    In your 'js' folder, create a subfolder called 'custom_plugins'. Place the following plugin file within that subfolder:
+    'plugin-audio-button-response-hcl.js' (This is a custom plugin that can be found in 'lab > Online Experiments > Modules > Headphones Check Lite'.)
+
+    This file likely needs no modification.
+
+-->
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>CMU Psychology Experiment - Headphones Check</title>
+        <meta charset="UTF-8">
+
+        <!-- These two JavaScript files are loaded for jsPsych and JATOS to function correctly. -->
+        <script src = "https://unpkg.com/jspsych@7.2.1"></script>
+        <script src = "jatos.js"></script>
+
+        <!-- These plugins are required for the functioning of the Typing Screening Form. -->
+        <script src = "https://unpkg.com/@jspsych/plugin-preload@1.1.0"></script>
+        <script src = "https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.1.0"></script>
+        <script src = "https://unpkg.com/@jspsych/plugin-audio-keyboard-response@1.1.0"></script>
+        <script src = "js/plugins/plugin-audio-button-response-hcl.js"></script>
+
+        <!-- We load the Typing Screening JavaScript file here. -->
+        <script src = "js/headphones_check_lite.js"></script>
+
+        <!-- We load CSS styling here. -->
+        <link href = "https://unpkg.com/jspsych@7.2.1/css/jspsych.css" rel="stylesheet" type="text/css" />
+        <link rel="icon" href="css/university.png" />
+
+        <!-- Custom CSS for the Headphones Check Lite image buttons. -->
+        <style type = "text/css">
+            img {
+              width:22.5%;
+              height: auto;
+              vertical-align: middle;
+            }
+      </style>
+    </head>
+    <body>
+    </body>
+</html>
