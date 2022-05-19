@@ -92,11 +92,12 @@ var jsPsychHtmlAudioResponseMod = (function (jspsych) {
 
           html += '<br> <span class = "hidden_text" id = "reminder"> Please respond. </span>';
           display_element.innerHTML = html;
-          var hidden_message = null
+          var target_selected = null
           this.jsPsych.pluginAPI.setTimeout(()=> {
               target_selected = document.getElementById("target"),
               target_selected.classList.replace('unselected','selected')
             }, 2000);
+          var hidden_message = null
           this.jsPsych.pluginAPI.setTimeout(()=> {
               hidden_message = document.getElementById("reminder"),
               hidden_message.classList.replace('hidden_text','visible_text')

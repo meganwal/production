@@ -185,29 +185,43 @@ let final_test = {
             target_idx = tmp_foil_images.findIndex((element) => element == this_target)
 
             if(target_idx == 0) {
-              this_foils.push(all_image_list[this_type_num][tmp_foil_images.splice(1,2)])
-              console.log("0")
-              console.log(this_type_num)
-              console.log(all_image_list[this_type_num][[0,1]])
+              to_push = tmp_foil_images.splice(1,2)
+              console.log(to_push)
+              for (this_item of to_push) {
+                this_foils.push(all_image_list[this_type_num][this_item])
+              }
               console.log(this_foils)
+              // console.log("0")
+              // console.log(this_type_num)
+              // console.log(all_image_list[this_type_num][[0,1]])
+              // console.log(this_foils)
             } else if(target_idx == 1) {
               this_foils.push(all_image_list[this_type_num][tmp_foil_images.splice(0,1)])
               this_foils.push(all_image_list[this_type_num][tmp_foil_images.splice(1,1)])
-              console.log("1")
-              console.log(this_type_num)
-              console.log(all_image_list[this_type_num][[0,1]])
               console.log(this_foils)
+              // console.log("1")
+              // console.log(this_type_num)
+              // console.log(all_image_list[this_type_num][[0,1]])
             } else {
-              this_foils.push(all_image_list[this_type_num][tmp_foil_images.splice(0,2)])
-              console.log("else")
-              console.log(this_type_num)
-              console.log(all_image_list)
-              console.log(all_image_list[this_type_num][[0,1]])
+              to_push = tmp_foil_images.splice(0,2)
+              console.log(to_push)
+              for (this_item of to_push) {
+                this_foils.push(all_image_list[this_type_num][this_item])
+              }
               console.log(this_foils)
+              // console.log("else")
+              // console.log(this_type_num)
+              // console.log(all_image_list)
+              // console.log(all_image_list[this_type_num][[0,1]])
+              // console.log(this_foils)
             }
           } else {
-
-            this_foils.push(all_image_list[this_type_num][tmp_foil_images.splice(0,3)])
+            to_push = tmp_foil_images.splice(0,3)
+            console.log(to_push)
+            for (this_item of to_push) {
+              this_foils.push(all_image_list[this_type_num][this_item])
+            }
+            console.log(this_foils)
           }
         }
         image_list.push(_.flatten(this_foils))

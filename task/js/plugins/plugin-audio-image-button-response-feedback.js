@@ -245,7 +245,7 @@ var jsPsychAudioImageButtonResponseFeedback = (function (jspsych) {
                   // move on to the next trial
                   this.jsPsych.finishTrial(trial_data);
                   trial_complete();
-              }, 2000); // CHANGE TIME-LENGTH OF FEEDBACK HERE
+              }, 3000); // CHANGE TIME-LENGTH OF FEEDBACK HERE
 
           };
           function button_response(e) {

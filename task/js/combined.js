@@ -813,7 +813,7 @@ jatos.onLoad(function() {
 
   // Complete semantic block
   let sem_block = {
-    timeline: [sem_preload, intro_directions, sem_introduction_trials,
+    timeline: [sem_preload, intro_directions,
       training_directions, sem_training_trials, test_directions, sem_test_trials],
   };
 
@@ -858,7 +858,7 @@ jatos.onLoad(function() {
 
   // Complete phonological block
   let phon_block = {
-    timeline: [phon_preload, intro_directions, phon_introduction_trials,
+    timeline: [phon_preload, intro_directions,
       training_directions, phon_training_trials, test_directions, phon_test_trials],
   };
 
@@ -902,7 +902,7 @@ jatos.onLoad(function() {
 
   // Complete unrelated block
   let unrel_block = {
-    timeline: [unrel_preload, intro_directions, unrel_introduction_trials,
+    timeline: [unrel_preload, intro_directions,
       training_directions, unrel_training_trials, test_directions, unrel_test_trials],
   };
 
@@ -914,11 +914,10 @@ jatos.onLoad(function() {
     }
 
   // CREATE AND RUN TIMELINE
-  let timeline = [welcome, loop_mic_check, final_test_trials]
+  let timeline = [welcome, loop_mic_check]
   let blocks = [sem_block, phon_block, unrel_block]
   shuffle(blocks);
   timeline.push(blocks[0], break_directions, blocks[1], break_directions, blocks[2])
-  console.log(timeline)
   jsPsych.run(timeline);
 
 
