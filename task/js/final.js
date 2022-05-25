@@ -3,8 +3,8 @@
 let jsPsych = initJsPsych({
   on_finish: function() {
     let resultJson = jsPsych.data.get().json();
-    // jatos.submitResultData(resultJson);
-    // jatos.startNextComponent();
+    jatos.submitResultData(resultJson);
+    jatos.startNextComponent();
   },
 });
 
@@ -14,7 +14,6 @@ function shuffle(array) {
     [array[i], array[j]] = [array[j], array[i]];
   }
 }
-
 
 // CODE TO GENERATE SEMANTIC, PHONOLOGICAL, AND UNRELATED IMAGE/WORD LISTS
 var sem_image_1 = ["media/images/bird1.png", "media/images/bird2.png",
@@ -86,7 +85,109 @@ let unrel_index_list = [{ index: 0, block: 'unrelated' },
 { index: 3, block: 'unrelated' }, { index: 4, block: 'unrelated' },
 { index: 5, block: 'unrelated' }, { index: 6, block: 'unrelated' },
 { index: 7, block: 'unrelated' }, { index: 8, block: 'unrelated' }]
+var all_image_list = [sem_image_list, unrel_image_list, phon_image_list]
+var all_word_list = [sem_word_list, unrel_word_list, phon_word_list]
 
+// Final Test - testing each target once, pulling 3 stimuli from each block type
+var trial_structure = function(){
+  var all_stims = []
+  var targets = [
+    {type_num: 0, type: "sem", indicies: _.range(9)},
+    {type_num: 1, type: "unrel", indicies: _.range(9)},
+    {type_num: 2, type: "phon", indicies: _.range(9)}]
+
+  var original_foils = _.cloneDeep(targets)
+  var foils = _.cloneDeep(original_foils)
+
+  _.map(targets, function(o){o['indicies'] = _.shuffle(o['indicies'])})
+  _.map(foils, function(o){o['indicies'] = _.shuffle(o['indicies'])})
+
+  var types = ["sem", "unrel", "phon"]
+
+  var this_type_array;
+  var this_target;
+  var this_foils = [];
+  var tmp_foils;
+  var target_idx;
+  var target_image;
+  var target_word;
+
+  for (var i = 0; i < 9; i++) {
+    for(const this_type of types) {
+
+      this_type_array =  _.find(targets, ['type', this_type])
+      this_target = this_type_array['indicies'].splice(0,1)
+      this_type_num = this_type_array['type_num']
+
+      target_image = all_image_list[this_type_num][this_target]
+      target_word = all_word_list[this_type_num][this_target]
+
+      this_foils = [];
+
+      var image_list = [];
+      image_list.push(target_image)
+
+
+      for(const this_foil_type of types) {
+
+        if(this_foil_type == this_type) {
+          tmp_foils = _.find(foils, ['type', this_foil_type])
+          tmp_foil_images = tmp_foils['indicies']
+
+          target_idx = tmp_foil_images.findIndex((element) => element == this_target)
+
+          if(target_idx == 0) {
+            to_push = tmp_foil_images.splice(1,2)
+            for (this_item of to_push) {
+              this_foils.push(all_image_list[this_type_num][this_item])
+            }
+            console.log("0")
+            console.log(this_foils)
+            console.log(this_type)
+          } else if(target_idx == 1) {
+            this_foils.push(all_image_list[this_type_num][tmp_foil_images.splice(0,1)])
+            this_foils.push(all_image_list[this_type_num][tmp_foil_images.splice(1,1)])
+            console.log("1")
+            console.log(this_type)
+            console.log(this_foils)
+          } else {
+            to_push = tmp_foil_images.splice(0,2)
+            for (this_item of to_push) {
+              this_foils.push(all_image_list[this_type_num][this_item])
+            }
+            console.log("else")
+            console.log(this_type)
+            console.log(this_foils)
+          }
+        } else {
+          tmp_foils = _.find(foils, ['type', this_foil_type])
+          tmp_foil_images = tmp_foils['indicies']
+          var other_type_num = tmp_foils['type_num']
+          to_push = tmp_foil_images.splice(0,3)
+          for (this_item of to_push) {
+            this_foils.push(all_image_list[other_type_num][this_item])
+          }
+          console.log("other")
+          console.log(this_foil_type)
+          console.log(this_foils)
+        }
+      }
+      image_list.push(this_foils)
+
+      image_list = _.flatten(image_list)
+      image_list = _.shuffle(image_list)
+
+      target_foil_index = image_list.findIndex((element) => element == target_image)
+
+      all_stims.push({"index": target_foil_index, "images":image_list, "sound": target_word, "type": this_type})
+    }
+    foils = _.cloneDeep(original_foils)
+  }
+  console.log(all_stims)
+  return all_stims
+}
+
+var final_block_stims = trial_structure()
 
 // BUILD EXPERIMENTAL TRIALS
 
@@ -100,10 +201,13 @@ let fixation = {
 
 let final_test = {
   type: jsPsychAudioImageButtonResponseNoFeedback,
-  stimulus: "media/audio/Click" + jsPsych.timelineVariable('sound') + ".flac",
+  stimulus: function() {
+    var word = jsPsych.timelineVariable("sound");
+    return "media/audio/Click" + word + ".flac";
+    },
   choices: "",
   button_html: function() {
-    let image_list = jsPsych.timelineVariable('image_list')
+    let image_list = jsPsych.timelineVariable('images')
 
     // Add target image to grid of nine images
     let html_target_image = "<img class = 'jspsych-audio-button-response-button unselected' style = 'cursor: pointer;' id = 'target' data-choice = '{image: " + image_list[jsPsych.timelineVariable('index')] + "}' src = '" + image_list[jsPsych.timelineVariable('index')] + "'>";
@@ -133,112 +237,6 @@ let final_test = {
   },
 };
 
-
-  // Final Test - testing each target once, pulling 3 stimuli from each block type
-  var trial_structure = function(){
-    var all_stims = []
-    var targets = [
-      {type_num: 0, type: "sem", indicies: _.range(9)},
-      {type_num: 1, type: "neither", indicies: _.range(9)},
-      {type_num: 2, type: "phon", indicies: _.range(9)}]
-    var all_image_list = [sem_image_list, unrel_image_list, phon_image_list]
-    var all_word_list = [sem_word_list, unrel_word_list, phon_word_list]
-
-    var original_foils = _.cloneDeep(targets)
-    var foils = _.cloneDeep(original_foils)
-
-    _.map(targets, function(o){o['indicies'] = _.shuffle(o['indicies'])})
-    _.map(foils, function(o){o['indicies'] = _.shuffle(o['indicies'])})
-
-    var types = ["sem", "unrel", "phon"]
-
-    var this_type_array;
-    var this_target;
-    var this_foils = [];
-    var tmp_foils;
-    var tmp_foil_images;
-    var target_idx;
-    var target_image;
-    var target_word;
-
-    for (var i = 0; i < 9; i++) {
-      for(const this_type of types) {
-
-        this_type_array =  _.find(targets, ['type', this_type])
-        this_target = this_type_array['indicies'].splice(0,1)
-        this_type_num = this_type_array['type_num']
-
-        target_image = all_image_list[this_type_num][this_target]
-        target_word = all_word_list[this_type_num][this_target]
-
-        this_foils = [];
-
-        var image_list = [];
-        image_list.push(target_image)
-
-        for(const this_foil_type of types) {
-
-          if(this_foil_type == this_type) {
-            tmp_foils = _.find(foils, ['type', this_foil_type])
-            tmp_foil_images = tmp_foils['indicies']
-
-            target_idx = tmp_foil_images.findIndex((element) => element == this_target)
-
-            if(target_idx == 0) {
-              to_push = tmp_foil_images.splice(1,2)
-              console.log(to_push)
-              for (this_item of to_push) {
-                this_foils.push(all_image_list[this_type_num][this_item])
-              }
-              console.log(this_foils)
-              // console.log("0")
-              // console.log(this_type_num)
-              // console.log(all_image_list[this_type_num][[0,1]])
-              // console.log(this_foils)
-            } else if(target_idx == 1) {
-              this_foils.push(all_image_list[this_type_num][tmp_foil_images.splice(0,1)])
-              this_foils.push(all_image_list[this_type_num][tmp_foil_images.splice(1,1)])
-              console.log(this_foils)
-              // console.log("1")
-              // console.log(this_type_num)
-              // console.log(all_image_list[this_type_num][[0,1]])
-            } else {
-              to_push = tmp_foil_images.splice(0,2)
-              console.log(to_push)
-              for (this_item of to_push) {
-                this_foils.push(all_image_list[this_type_num][this_item])
-              }
-              console.log(this_foils)
-              // console.log("else")
-              // console.log(this_type_num)
-              // console.log(all_image_list)
-              // console.log(all_image_list[this_type_num][[0,1]])
-              // console.log(this_foils)
-            }
-          } else {
-            to_push = tmp_foil_images.splice(0,3)
-            console.log(to_push)
-            for (this_item of to_push) {
-              this_foils.push(all_image_list[this_type_num][this_item])
-            }
-            console.log(this_foils)
-          }
-        }
-        image_list.push(_.flatten(this_foils))
-        image_list = _.shuffle(image_list)
-
-
-        target_foil_index = image_list.findIndex((element) => element == target_image)
-
-        all_stims.push({"index": target_foil_index, "images":image_list, "sound": target_word, "type": this_type})
-      }
-      foils = _.cloneDeep(original_foils)
-    }
-    return all_stims
-  }
-
-  var final_block_stims = trial_structure()
-
   // Final block
 let final_test_trials = {
   timeline: [fixation, final_test],
@@ -246,6 +244,46 @@ let final_test_trials = {
   randomize_order: false,
   }
 
-let timeline = [final_test_trials]
+let directions = {
+  type: jsPsychHtmlButtonResponse,
+  stimulus: `
+            <div class = "instructions_text">
+              <p>Welcome to the experiement.</p>
+              <p>In this study, you will be asked to remember the names of a series of pictures.</p>
+              <p>Press "Continue" to proceed.</p>
+            </div>
+            `,
+  choices: ['Continue'],
+};
+
+let preload = {
+  type: jsPsychPreload,
+  images: function() {
+    images = _.flatten(all_image_list);
+    return images;
+  },
+  audio: function() {
+    var words = _.flatten(all_word_list)
+    let audio_list = [];
+    for (let i = 0; i < all_word_list.length; i++) {
+      audio_list.push("media/audio/Click" + words[i] + ".flac")
+    }
+    return audio_list;
+  },
+};
+
+let final_trial_directions = {
+  type: jsPsychHtmlButtonResponse,
+  stimulus: `
+            <div class = "instructions_text">
+              <p>Now all three of the sets you practiced will be combined.</p>
+              <p>You will see a grid of nine pictures and will be told to <b> click on </b> one of the images.</p>
+              <p>Press "Continue" to proceed.</p>
+            </div>
+            `,
+  choices: ['Continue'],
+}
+
+let timeline = [final_trial_directions, preload, final_test_trials]
 
 jsPsych.run(timeline);

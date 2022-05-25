@@ -94,7 +94,7 @@ var jsPsychHtmlAudioResponseMod = (function (jspsych) {
           display_element.innerHTML = html;
           var target_selected = null
           this.jsPsych.pluginAPI.setTimeout(()=> {
-              target_selected = document.getElementById("target"),
+              target_selected = document.getElementById("finish-trial"),
               target_selected.classList.replace('unselected','selected')
             }, 2000);
           var hidden_message = null

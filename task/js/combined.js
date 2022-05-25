@@ -76,7 +76,7 @@ jatos.onLoad(function() {
   shuffle(phon_word_list)
 
   // temporary order, replace with JATOS Batch Session variable
-  let condition = 3
+  let condition = 2
 
   let sem_index_list = [{ index: 0, block: 'semantic' },
   { index: 1, block: 'semantic' },{ index: 2, block: 'semantic' },
@@ -339,13 +339,13 @@ jatos.onLoad(function() {
       }
 
       // Add target image to grid of nine images, with blue border
-      let html_target_image = "<img class = 'unselected' id = 'target' target-word = '" + target_word + "' src = '" + image_list[jsPsych.timelineVariable('index')] + "'>";
+      let html_target_image = "<img class = 'unselected' style = 'cursor: pointer;' id= 'finish-trial' target-word = '" + target_word + "' src = '" + image_list[jsPsych.timelineVariable('index')] + "'>";
       let html_image_list = [html_target_image];
 
       // Add each of the eight foil images to grid of nine images, with no border
       for (let i = 0; i < image_list.length; i++) {
         if (i != jsPsych.timelineVariable('index')) {
-          let html_foil_image = "<img class = 'unselected' id = 'foil' src = '" + image_list[i] + "'>";
+          let html_foil_image = "<img class = 'unselected' style = 'cursor: pointer;' id = 'foil' src = '" + image_list[i] + "'>";
           html_image_list.push(html_foil_image);
         }
       }
@@ -358,7 +358,7 @@ jatos.onLoad(function() {
       return "<div class = 'grid'>" + html_images_string + "</div>";
     },
     recording_duration: 1000000,
-    show_done_button: true,
+    show_done_button: false,
     data: {
       task: 'training',
       block: jsPsych.timelineVariable('block'),
@@ -501,86 +501,6 @@ jatos.onLoad(function() {
       word: jsPsych.timelineVariable('sound'),
     },
   };
-
-
-  // Final Test - testing each target once, pulling 3 stimuli from each block type
-  var trial_structure = function(){
-    var all_stims = []
-    var targets = [
-      {type_num: 0, type: "sem", indicies: _.range(8)},
-      {type_num: 1, type: "unrel", indicies: _.range(8)},
-      {type_num: 2, type: "phon", indicies: _.range(8)}]
-    var all_image_list = [sem_image_list, unrel_image_list, phon_image_list]
-    var all_word_list = [sem_word_list, unrel_word_list, phon_word_list]
-
-    var original_foils = _.cloneDeep(targets)
-    var foils = _.cloneDeep(original_foils)
-
-    _.map(targets, function(o){o['indicies'] = _.shuffle(o['indicies'])})
-    _.map(foils, function(o){o['indicies'] = _.shuffle(o['indicies'])})
-
-    var types = ["sem", "unrel", "phon"]
-
-    var this_type_array;
-    var this_target;
-    var this_foils = [];
-    var tmp_foils;
-    var tmp_foil_images;
-    var target_idx;
-    var target_image;
-    var target_word;
-
-    for (var i = 0; i < 9; i++) {
-      for(const this_type of types) {
-
-        this_type_array =  _.find(targets, ['type', this_type])
-        this_target = this_type_array['indicies'].splice(0,1)
-        this_type_num = this_type_array['type_num']
-
-        target_image = all_image_list[this_type_num][this_target]
-        target_word = all_word_list[this_type_num][this_target]
-
-        this_foils = [];
-
-        var image_list = [];
-        image_list.push(target_image)
-
-        for(const this_foil_type of types) {
-
-          if(this_foil_type == this_type) {
-            tmp_foils = _.find(foils, ['type', this_foil_type])
-            tmp_foil_images = tmp_foils['indicies']
-            target_idx = tmp_foil_images.findIndex((element) => element == this_target)
-
-            if(target_idx == 0) {
-              this_foils.push(all_image_list[this_type_num][tmp_foil_images.splice(1,2)])
-            } else if(target_idx == 1) {
-              this_foils.push(all_image_list[this_type_num][tmp_foil_images.splice(0,1)])
-              this_foils.push(all_image_list[this_type_num][tmp_foil_images.splice(1,1)])
-            } else {
-              this_foils.push(all_image_list[this_type_num][tmp_foil_images.splice(0,2)])
-            }
-          } else {
-
-            tmp_foils = _.find(foils, ['type', this_foil_type])
-
-            this_foils.push(all_image_list[this_type_num][tmp_foil_images.splice(0,3)])
-          }
-        }
-
-        image_list.push(_.flatten(this_foils))
-        image_list = _.shuffle(image_list)
-
-        target_foil_index = image_list.findIndex((element) => element == target_image)
-
-        all_stims.push({"index": target_foil_index, "images":image_list, "sound": target_word, "type": this_type})
-      }
-      foils = _.cloneDeep(original_foils)
-    }
-    return all_stims
-  }
-
-  var final_block_stims = trial_structure()
 
   // BEGIN EXPERIMENT
 
@@ -748,19 +668,6 @@ jatos.onLoad(function() {
     choices: ['Continue'],
   }
 
-  // Break Directions
-  let final_trial_directions = {
-    type: jsPsychHtmlButtonResponse,
-    stimulus: `
-              <div class = "instructions_text">
-                <p>Now all three of the sets you encountered will be combined.</p>
-                <p>You will see a grid of nine pictures and will be told to <b> click on </b> one of the images.</p>
-                <p>Press "Continue" to proceed.</p>
-              </div>
-              `,
-    choices: ['Continue'],
-  }
-
   // Establish condition
   if (condition == 1) {
     var training = study_training
@@ -813,7 +720,7 @@ jatos.onLoad(function() {
 
   // Complete semantic block
   let sem_block = {
-    timeline: [sem_preload, intro_directions,
+    timeline: [sem_preload, intro_directions, sem_introduction_trials,
       training_directions, sem_training_trials, test_directions, sem_test_trials],
   };
 
@@ -858,7 +765,7 @@ jatos.onLoad(function() {
 
   // Complete phonological block
   let phon_block = {
-    timeline: [phon_preload, intro_directions,
+    timeline: [phon_preload, intro_directions, phon_introduction_trials,
       training_directions, phon_training_trials, test_directions, phon_test_trials],
   };
 
@@ -903,15 +810,9 @@ jatos.onLoad(function() {
   // Complete unrelated block
   let unrel_block = {
     timeline: [unrel_preload, intro_directions,
-      training_directions, unrel_training_trials, test_directions, unrel_test_trials],
+      unrel_introduction_trials, training_directions, unrel_training_trials,
+      test_directions, unrel_test_trials],
   };
-
-    // Final block
-  let final_test_trials = {
-    timeline: [fixation, final_test],
-    timeline_variables: final_block_stims,
-    randomize_order: false,
-    }
 
   // CREATE AND RUN TIMELINE
   let timeline = [welcome, loop_mic_check]
@@ -919,7 +820,6 @@ jatos.onLoad(function() {
   shuffle(blocks);
   timeline.push(blocks[0], break_directions, blocks[1], break_directions, blocks[2])
   jsPsych.run(timeline);
-
 
 
 });
