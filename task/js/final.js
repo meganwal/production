@@ -1,12 +1,33 @@
-// INITIALIZE JSPSYCH
 
-let jsPsych = initJsPsych({
-  on_finish: function() {
-    let resultJson = jsPsych.data.get().json();
-    jatos.submitResultData(resultJson);
-    jatos.startNextComponent();
-  },
+jatos.onLoad(function() {
+
+  // INITIALIZE JSPSYCH
+  let jsPsych = initJsPsych({
+    on_finish: function() {
+      let resultJson = jsPsych.data.get().json();
+      jatos.submitResultData(resultJson);
+      component_ending = true
+      jatos.startNextComponent();
+    },
+    on_close: function() {
+        // Only execute if the Component is not being ended by JATOS (but instead, by manual close by the participant).
+        if (typeof component_ending === "undefined") {
+            // Retrieve all data from the Batch Session.
+            let batchSession = jatos.batchSession.getAll();
+            // Retrieve the list of versions you manually entered as per 'Instructions for Running an Online Experiment: Rotating participant versions'
+            let versionsList = batchSession.versionsList;
+            // Get present version
+            version =  jatos.studySessionData.version;
+            // As long as the version list exists, add the present version back into the list.
+            if (versionsList) {
+                versionsList.push(version)
+                jatos.batchSession.set("versionsList", versionsList)
+            }
+        }
+    },
 });
+// Retrieve all data from the Batch Session. This is in the form of an object with various key-value pairs.
+let batchSession = jatos.batchSession.getAll();
 
 function shuffle(array) {
   for (let i = array.length - 1; i > 0; i--) {
@@ -15,76 +36,13 @@ function shuffle(array) {
   }
 }
 
-// CODE TO GENERATE SEMANTIC, PHONOLOGICAL, AND UNRELATED IMAGE/WORD LISTS
-var sem_image_1 = ["media/images/bird1.png", "media/images/bird2.png",
-"media/images/bird3.png", "media/images/bird4.png", "media/images/bird5.png",
-"media/images/bird6.png", "media/images/bird7.png", "media/images/bird8.png",
-"media/images/bird9.png"]
-var sem_image_2 = ["media/images/flower1.png", "media/images/flower2.png",
-"media/images/flower3.png", "media/images/flower4.png",
-"media/images/flower5.png", "media/images/flower6.png",
-"media/images/flower7.png", "media/images/flower8.png",
-"media/images/flower9.png"]
-var sem_image_3 = ["media/images/fruit1.png", "media/images/fruit2.png",
-"media/images/fruit3.png", "media/images/fruit4.png",
-"media/images/fruit5.png", "media/images/fruit6.png",
-"media/images/fruit7.png", "media/images/fruit8.png",
-"media/images/fruit9.png"]
-var no_conflict_image_1 = ["media/images/group1_1.png", "media/images/group1_2.png",
-"media/images/group1_3.png", "media/images/group1_4.png",
-"media/images/group1_5.png", "media/images/group1_6.png",
-"media/images/group1_7.png", "media/images/group1_8.png",
-"media/images/group1_9.png"]
-var no_conflict_image_2 = ["media/images/group2_1.png", "media/images/group2_2.png",
-"media/images/group2_3.png", "media/images/group2_4.png",
-"media/images/group2_5.png", "media/images/group2_6.png",
-"media/images/group2_7.png", "media/images/group2_8.png",
-"media/images/group2_9.png"]
+// CALL SUBJECTS IMAGE/WORD LISTS
+let all_image_list = jatos.studySessionData.all_image_list
+let all_word_list = jatos.studySessionData.all_word_list
 
-var possible_sem = [sem_image_1, sem_image_2, sem_image_3]
-shuffle(possible_sem);
+// retrieve contition
+let condition = jatos.studySessionData.version
 
-var possible_no_conflict_image = [no_conflict_image_1, no_conflict_image_2]
-shuffle(possible_no_conflict_image);
-
-let sem_image_list = possible_sem[0]
-let phon_image_list = possible_no_conflict_image[0]
-let unrel_image_list = possible_no_conflict_image[1]
-
-var no_conflict_audio_1 = ["Lopi", "Hane","Nush","Jick","Bola","Darg","Raf",
-"Veng", "Manit"]
-shuffle(no_conflict_audio_1)
-var no_conflict_audio_2 = ["Soodle", "Goke", "Pazz", "Fupp", "Wilp", "Cheem",
-"Zev", "Kiben", "Tevo"]
-shuffle(no_conflict_audio_2)
-var possible_no_conflict_audio = [no_conflict_audio_1, no_conflict_audio_2]
-shuffle(possible_no_conflict_audio)
-
-let sem_word_list = possible_no_conflict_audio[0]
-let unrel_word_list = possible_no_conflict_audio[1]
-
-var phon_word_list = ["Ratu", "Ribe", "Biss", "Sar", "Riso", "Bast", "Seb",
-"Tib", "Tasser"]
-shuffle(phon_word_list)
-
-// temporary order, replace with JATOS Batch Session variable
-let condition = 3
-
-let sem_index_list = [{ index: 0, block: 'semantic' },
-{ index: 1, block: 'semantic' },{ index: 2, block: 'semantic' },
-{ index: 3, block: 'semantic' }, { index: 4, block: 'semantic' },
-{ index: 5, block: 'semantic' }, { index: 6, block: 'semantic' },
- { index: 7, block: 'semantic' }, { index: 8, block: 'semantic' }]
-let phon_index_list = [{ index: 0, block: 'phonological' },
-{ index: 1, block: 'phonological' }, { index: 2, block: 'phonological' },
-{ index: 3, block: 'phonological' }, { index: 4, block: 'phonological' },
-{ index: 5, block: 'phonological' }, { index: 6, block: 'phonological' },
-{ index: 7, block: 'phonological' }, { index: 8, block: 'phonological' }]
-let unrel_index_list = [{ index: 0, block: 'unrelated' },
-{ index: 1, block: 'unrelated' }, { index: 2, block: 'unrelated' },
-{ index: 3, block: 'unrelated' }, { index: 4, block: 'unrelated' },
-{ index: 5, block: 'unrelated' }, { index: 6, block: 'unrelated' },
-{ index: 7, block: 'unrelated' }, { index: 8, block: 'unrelated' }]
 var all_image_list = [sem_image_list, unrel_image_list, phon_image_list]
 var all_word_list = [sem_word_list, unrel_word_list, phon_word_list]
 
@@ -141,23 +99,17 @@ var trial_structure = function(){
             for (this_item of to_push) {
               this_foils.push(all_image_list[this_type_num][this_item])
             }
-            console.log("0")
-            console.log(this_foils)
-            console.log(this_type)
+
           } else if(target_idx == 1) {
             this_foils.push(all_image_list[this_type_num][tmp_foil_images.splice(0,1)])
             this_foils.push(all_image_list[this_type_num][tmp_foil_images.splice(1,1)])
-            console.log("1")
-            console.log(this_type)
-            console.log(this_foils)
+
           } else {
             to_push = tmp_foil_images.splice(0,2)
             for (this_item of to_push) {
               this_foils.push(all_image_list[this_type_num][this_item])
             }
-            console.log("else")
-            console.log(this_type)
-            console.log(this_foils)
+
           }
         } else {
           tmp_foils = _.find(foils, ['type', this_foil_type])
@@ -167,9 +119,6 @@ var trial_structure = function(){
           for (this_item of to_push) {
             this_foils.push(all_image_list[other_type_num][this_item])
           }
-          console.log("other")
-          console.log(this_foil_type)
-          console.log(this_foils)
         }
       }
       image_list.push(this_foils)
@@ -183,7 +132,7 @@ var trial_structure = function(){
     }
     foils = _.cloneDeep(original_foils)
   }
-  console.log(all_stims)
+
   return all_stims
 }
 
@@ -244,18 +193,6 @@ let final_test_trials = {
   randomize_order: false,
   }
 
-let directions = {
-  type: jsPsychHtmlButtonResponse,
-  stimulus: `
-            <div class = "instructions_text">
-              <p>Welcome to the experiement.</p>
-              <p>In this study, you will be asked to remember the names of a series of pictures.</p>
-              <p>Press "Continue" to proceed.</p>
-            </div>
-            `,
-  choices: ['Continue'],
-};
-
 let preload = {
   type: jsPsychPreload,
   images: function() {
@@ -284,6 +221,38 @@ let final_trial_directions = {
   choices: ['Continue'],
 }
 
-let timeline = [final_trial_directions, preload, final_test_trials]
+let final_break = {
+  type: jsPsychHtmlButtonResponse,
+  stimulus: `
+            <div class = "instructions_text">
+              <p>You may now take a break.</p>
+              <p>This page will progress automatically in 3 minutes.</p>
+            </div>
+            `,
+  choices: ['Continue'],
+  trial_duration: 180000,
+  response_ends_trial: false,
+}
 
-jsPsych.run(timeline);
+let timelineBare = [final_break, final_trial_directions, preload, final_test_trials]
+
+
+  let completeTimeline = {
+      timeline: timelineBare,
+      data: {
+          version: version,
+
+          // This key-value pair labels every trial as part of the Component "experiment". This is useful when parsing your raw data.
+          // For example, you can use this label to categorize your data and create separate CSVs for different Components.
+          // You will most likely want to change this for each component.
+          component: 'final',
+
+          // We recommend you keep this addition to each trial.
+          // jatos.studySessionData was described above in the counterbalancing section. This data is accessible to every Component in a single participant's run of the study.
+          // In the 'consent.html' template, Study Session data was created. It is an object with:
+          //      The URL parameters pulled from Prolific or Sona (e.g. a participant's Prolific or Sona ID), an automatically-assigned JATOS ID, the data/time of consent, and version assigned above.
+          urlparameters_and_date: jatos.studySessionData,
+      },
+  }
+  let timeline = [completeTimeline];
+  jsPsych.run(timeline);

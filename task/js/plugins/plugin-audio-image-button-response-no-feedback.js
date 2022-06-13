@@ -144,7 +144,7 @@ var jsPsychAudioImageButtonResponseNoFeedback = (function (jspsych) {
               this.jsPsych.pluginAPI.setTimeout(()=> {
                   hidden_message = document.getElementById("reminder"),
                   hidden_message.classList.replace('hidden_text','visible_text')
-                }, 5000);
+                }, 7000);
 
               //show prompt if there is one
               if (trial.prompt !== null) {
@@ -162,7 +162,9 @@ var jsPsychAudioImageButtonResponseNoFeedback = (function (jspsych) {
               // start audio
               if (context !== null) {
                   startTime = context.currentTime;
-                  this.audio.start(startTime);
+                  this.jsPsych.pluginAPI.setTimeout(()=> {
+                    this.audio.start(startTime);
+                  }, 2000);
               }
               else {
                   this.audio.play();

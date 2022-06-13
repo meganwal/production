@@ -94,7 +94,7 @@ var jsPsychHtmlAudioResponseMod = (function (jspsych) {
           display_element.innerHTML = html;
           var target_selected = null
           this.jsPsych.pluginAPI.setTimeout(()=> {
-              target_selected = document.getElementById("finish-trial"),
+              target_selected = document.getElementById("target"),
               target_selected.classList.replace('unselected','selected')
             }, 2000);
           var hidden_message = null
@@ -110,7 +110,7 @@ var jsPsychHtmlAudioResponseMod = (function (jspsych) {
           }
       }
       addButtonEvent(display_element, trial) {
-          const btn = display_element.querySelector("#finish-trial");
+          const btn = display_element.querySelector("#target");
 
           // MODIFICATION: INITIALLY DISABLE DONE BUTTON, ENABLE AFTER SPECIFIED TIME
           btn.disabled = true;
@@ -231,11 +231,12 @@ var jsPsychHtmlAudioResponseMod = (function (jspsych) {
           }
 
           // MODIFICATION: DISABLE DONE BUTTON, PLAY FEEDBACK (AUDIO OF TARGET WORD), AND THEN END TRIAL
-          const btn = display_element.querySelector("#finish-trial");
+          const btn = display_element.querySelector("#target");
           btn.disabled = true;
 
           var target_image = display_element.querySelector("#target");
           var target_word = target_image.getAttribute("target-word")
+          target_image.classList.replace('selected','correct')
 
           var context = this.jsPsych.pluginAPI.audioContext();
           var startTime;
@@ -249,7 +250,9 @@ var jsPsychHtmlAudioResponseMod = (function (jspsych) {
 
                       startTime = performance.now();
                       startTime = context.currentTime;
+                  setTimeout(() => {
                       this.audio.start(startTime);
+                    }, 500)
                   }
                   else {
                       this.audio = buffer;
@@ -260,7 +263,7 @@ var jsPsychHtmlAudioResponseMod = (function (jspsych) {
             setTimeout(() => {
                 display_element.innerHTML = "";
                 this.jsPsych.finishTrial(trial_data);
-            }, 3000) // CHANGE TIME-LENGTH OF WHEN TO END TRIAL HERE (E.G. AFTER LENGTH OF LONGEST AUDIO FILE) -- THIS IS A CONSTANT REGARDLESS OF LENGTH OF AUDIO FILE!
+            }, 3500) // CHANGE TIME-LENGTH OF WHEN TO END TRIAL HERE (E.G. AFTER LENGTH OF LONGEST AUDIO FILE) -- THIS IS A CONSTANT REGARDLESS OF LENGTH OF AUDIO FILE!
 
       }
   }
