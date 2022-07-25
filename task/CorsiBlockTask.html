@@ -5,7 +5,7 @@
         <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
         <meta content="utf-8" http-equiv="encoding">
         <!-- Title of the window -->
-        <title>Corsi Blocks task</title>
+        <title>CMU Psychology Experiment</title>
         <!-- Gibeau, R.-M. (submitted)                                      -->
         <!--     The Corsi Blocks task: Variations and coding with jsPsych. -->
         <!--     The Quantitative Methods for Psychology.                   -->
@@ -33,7 +33,7 @@
             // ******************************
             // *   Defining general stuff   *
             // ******************************
-        // jatos.onLoad(function() {
+        jatos.onLoad(function() {
             console.log('Begining of the parameter definitions')
 
             // Experiment parameters
@@ -183,8 +183,10 @@
 
             //ADDED IN VARIABLES
             var correctAttempts = 0;
-            jsPsych.data.addProperties({accuracy: false, extra: 1});
+            jsPsych.data.addProperties({task:'none', accuracy: false, extra: 1, correct: [], responses:[]});
             var tempAcc = false
+            var tempResponses = []
+            var tempCorrect = []
             var currentCycle = 0
             var practiceScore = 0
 
@@ -381,10 +383,15 @@
                     if (acc) {correctAttempts = correctAttempts + 1; practiceScore = practiceScore + 1};
                     currentCycle = currentCycle + 1;
                     tempAcc = acc
+                    tempResponses = responses
+                    tempCorrect = correct
 
                 },
                 on_finish: function(data){
+                    data.task = "corsi-block";
                     data.accuracy = tempAcc;
+                    data.responses = tempResponses;
+                    data.correct = tempCorrect;
                 }
             }
 
@@ -521,43 +528,54 @@
                 randomize_order:    sequenceRandomOrder
             }
 
-            timeline = [ FullScreenOn, SayWelcome, practice_instructions, RunPracticeTrials, RunExtraPractice, instructions_main, RunAllTrials, FullScreenOff, SayBye ]
+            var final_break = {
+              type: 'html-button-response',
+              stimulus: `
+                        <div class = "instructions_text">
+                          <p>You may now take a break.</p>
+                          <p>This page will progress automatically in 3 minutes.</p>
+                        </div>
+                        `,
+              choices: ['Continue'],
+              trial_duration: 180000,
+              response_ends_trial: false,
+            }
+
+            timeline = [ FullScreenOn, SayWelcome, practice_instructions, RunPracticeTrials, RunExtraPractice, instructions_main, RunAllTrials, FullScreenOff, SayBye, final_break]
         //Jatos Code
-        //     let completeTimelineProcedure = {
-        //       timeline: timeline,
-        //     //   preload_audio: audio, // better to load all external files before the experiment starts
-        //         // preload_images: images,
-        //       data: {
-        //         urlparameters_and_consent: function() {
-        //           return jatos.studySessionData;
-        //         },
-        //         prolific_id: function() {
-        //           return jatos.studySessionData.PROLIFIC_PID
-        //         },
-        //         prolific_study_id: function() {
-        //           return jatos.studySessionData.STUDY_ID
-        //         },
-        //         prolific_session_id: function() {
-        //           return jatos.studySessionData.SESSION_ID
-        //         },
-        //       },
-        //     }
-        //     completeTimeline = [completeTimelineProcedure]
+            let completeTimelineProcedure = {
+              timeline: timeline,
+              // preload_audio: audio, // better to load all external files before the experiment starts
+              // preload_images: images,
+              data: {
+                urlparameters_and_date: function() {
+                  return jatos.studySessionData;
+                },
+                component: function(){
+                  return "CorsiBlock"
+                },
+                prolific_id: function() {
+                  return jatos.studySessionData.PROLIFIC_PID
+                },
+                prolific_study_id: function() {
+                  return jatos.studySessionData.STUDY_ID
+                },
+                prolific_session_id: function() {
+                  return jatos.studySessionData.SESSION_ID
+                },
+              },
+            }
+            completeTimeline = [completeTimelineProcedure]
 
-        // /* start the experiment */
-        //       jsPsych.init( {
-        //         timeline: completeTimeline,
-        //         on_finish: function() {
-        //           var resultJson = jsPsych.data.get().json();
-        //           jatos.submitResultData(resultJson,jatos.startNextComponent);
-        //         },
-        //       });
-        //     });
-
-            jsPsych.init({
-                timeline: timeline,
-                preload_audio: [RecallSignal],
-            })
+        /* start the experiment */
+              jsPsych.init( {
+                timeline: completeTimeline,
+                on_finish: function() {
+                  var resultJson = jsPsych.data.get().json();
+                  jatos.submitResultData(resultJson,jatos.startNextComponent);
+                },
+              });
+            });
 
         </script>
     </body>

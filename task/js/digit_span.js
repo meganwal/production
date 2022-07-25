@@ -1,14 +1,35 @@
+
 jatos.onLoad(function() {
 
-// INITIALIZE JSPSYCH
+  // INITIALIZE JSPSYCH
+  let jsPsych = initJsPsych({
+    on_finish: function() {
+      let resultJson = jsPsych.data.get().json();
+      jatos.submitResultData(resultJson);
+      component_ending = true
+      jatos.startNextComponent();
+    },
+    on_close: function() {
+        // Only execute if the Component is not being ended by JATOS (but instead, by manual close by the participant).
+        if (typeof component_ending === "undefined") {
+            // Retrieve all data from the Batch Session.
+            let batchSession = jatos.batchSession.getAll();
+            // Retrieve the list of versions you manually entered as per 'Instructions for Running an Online Experiment: Rotating participant versions'
+            let versionsList = batchSession.versionsList;
+            // Get present version
+            version =  jatos.studySessionData.version;
+            // As long as the version list exists, add the present version back into the list.
+            if (versionsList) {
+                versionsList.push(version)
+                jatos.batchSession.set("versionsList", versionsList)
+            }
+        }
+    },
+});
+// Retrieve all data from the Batch Session. This is in the form of an object with various key-value pairs.
+let batchSession = jatos.batchSession.getAll();
+let version = jatos.studySessionData.version
 
-	let jsPsych = initJsPsych({
-		on_finish: function() {
-			let resultJson = jsPsych.data.get().json();
-			jatos.submitResultData(resultJson);
-			jatos.startNextComponent();
-		},
-	});
 //Define Global Variables
 	var timeline = [];
 
@@ -63,7 +84,7 @@ timeline.push(preload)
 // DIGIT SPAN FORWARD
 	var general_instructions = { // Instructions
  	type: jsPsychInstructions,
-    pages: ['<p>You are going to hear a sequence of numbers.</p>'+
+  pages: ['<p>You are going to hear a sequence of numbers.</p>'+
 	'<p>Listen carefully, they will be said only once. </p>' +
 	'<p>When you are invited to do so, please type the numbers you have just heard using the numeric keyboard only (e.g:123).</p>' +
 	'<p>Type them in the exact same order that they have been said.</p>' +
@@ -306,6 +327,10 @@ timeline.push(preload)
 			   '<p>Click on "Next" when you are done. </p>?'},
 		     ],
 		   button_label: "Next",
+       data: {
+         task: 'digit_response',
+         audio: function(){return DSF_audio_stimuli[currentTrial-1]},
+       },
 	 	};
 
 		 var DSF_trials = { // create the DSF a trial
@@ -359,42 +384,23 @@ timeline.push(preload)
 
 	timeline.push(thanks);
 
+	let completeTimeline = {
+      timeline: timeline,
+      data: {
+          version: version,
 
+          // This key-value pair labels every trial as part of the Component "experiment". This is useful when parsing your raw data.
+          // For example, you can use this label to categorize your data and create separate CSVs for different Components.
+          // You will most likely want to change this for each component.
+          component: 'digitspan',
+          // We recommend you keep this addition to each trial.
+          // jatos.studySessionData was described above in the counterbalancing section. This data is accessible to every Component in a single participant's run of the study.
+          // In the 'consent.html' template, Study Session data was created. It is an object with:
+          //      The URL parameters pulled from Prolific or Sona (e.g. a participant's Prolific or Sona ID), an automatically-assigned JATOS ID, the data/time of consent, and version assigned above.
+          urlparameters_and_date: jatos.studySessionData,
+      },
+  }
+let timelineFull = [completeTimeline];
+jsPsych.run(timelineFull);
 
-jsPsych.run(timeline);
-
-//JATOS code
-// let completeTimelineProcedure = {
-//       timeline: timeline,
-//     //   preload_audio: audio, // better to load all external files before the experiment starts
-// 	  	// preload_images: images,
-//       data: {
-//         urlparameters_and_consent: function() {
-//           return jatos.studySessionData;
-//         },
-//         prolific_id: function() {
-//           return jatos.studySessionData.PROLIFIC_PID
-//         },
-//         prolific_study_id: function() {
-//           return jatos.studySessionData.STUDY_ID
-//         },
-//         prolific_session_id: function() {
-//           return jatos.studySessionData.SESSION_ID
-//         },
-//       },
-
-//     }
-//     completeTimeline = [completeTimelineProcedure]
-
-// /* start the experiment */
-//       jsPsych.init( {
-//         timeline: completeTimeline,
-//         on_finish: function() {
-//           var resultJson = jsPsych.data.get().json();
-//           jatos.submitResultData(resultJson,jatos.startNextComponent);
-//         },
-//       });
-//     });
-
-
-})
+});

@@ -1,15 +1,12 @@
-// JS for STUDY condition
-
 jatos.onLoad(function() {
 
-  // INITIALIZE JSPSYCH
-
-  let jsPsych = initJsPsych({
+// INITIALIZE JSPSYCH
+let jsPsych = initJsPsych({
     on_finish: function() {
-      let resultJson = jsPsych.data.get().json();
-      jatos.submitResultData(resultJson);
-      component_ending = true
-      jatos.startNextComponent();
+        let resultJson = jsPsych.data.get().json();
+        jatos.submitResultData(resultJson);
+        component_ending = true
+        jatos.startNextComponent();
     },
     on_close: function() {
         // Only execute if the Component is not being ended by JATOS (but instead, by manual close by the participant).
@@ -19,7 +16,7 @@ jatos.onLoad(function() {
             // Retrieve the list of versions you manually entered as per 'Instructions for Running an Online Experiment: Rotating participant versions'
             let versionsList = batchSession.versionsList;
             // Get present version
-            version =  jatos.studySessionData.version;
+            version = jatos.studySessionData.version;
             // As long as the version list exists, add the present version back into the list.
             if (versionsList) {
                 versionsList.push(version)
@@ -28,6 +25,7 @@ jatos.onLoad(function() {
         }
     },
 });
+
 // Retrieve all data from the Batch Session. This is in the form of an object with various key-value pairs.
 let batchSession = jatos.batchSession.getAll();
 // Retrieve the list of versions you manually entered as per 'Instructions for Running an Online Experiment: Rotating participant versions'
@@ -133,9 +131,6 @@ jatos.studySessionData.version = version;
   jatos.studySessionData.all_image_list = all_image_list;
   jatos.studySessionData.all_word_list = all_word_list;
 
-  // temporary order, replace with JATOS Batch Session variable
-  let condition = 3
-
   let sem_index_list = [{ index: 0, block: 'semantic' },
   { index: 1, block: 'semantic' },{ index: 2, block: 'semantic' },
   { index: 3, block: 'semantic' }, { index: 4, block: 'semantic' },
@@ -151,6 +146,8 @@ jatos.studySessionData.version = version;
   { index: 3, block: 'unrelated' }, { index: 4, block: 'unrelated' },
   { index: 5, block: 'unrelated' }, { index: 6, block: 'unrelated' },
   { index: 7, block: 'unrelated' }, { index: 8, block: 'unrelated' }]
+
+  var tempAcc = false
 
   // BUILD EXPERIMENTAL TRIALS
   // Fixation cross
@@ -171,7 +168,7 @@ jatos.studySessionData.version = version;
         recording_duration: 1000000,
         show_done_button: true,
         data: {
-          task: 'introduction',
+          task: 'introduction_training',
           block: 'practice',
         },
       };
@@ -201,7 +198,7 @@ jatos.studySessionData.version = version;
       trial_duration: null, // ADD TRIAL DURATION??
       response_allowed_while_playing: false,
       data: {
-        task: 'training',
+        task: 'study_training_practice',
         block: 'practice',
       },
     };
@@ -232,10 +229,29 @@ jatos.studySessionData.version = version;
       trial_duration: null, // ADD TRIAL DURATION??
       response_allowed_while_playing: false,
       data: {
-        task: 'training',
+        task: 'comp_training_practice',
         block: 'practice',
       },
+     //  on_finish: function(){
+     //    var data = jsPsych.data.get().last(1).values()[0];
+     //    var response = data['response'];
+     //    if ('{image: "media/images/practice1.png"}' == response){
+     //      tempAcc = true;
+     //    }
+     // },
     };
+
+    // let practice_feedback = {
+    //     type: jsPsychHtmlButtonResponse,
+    //     stimulus: function(){
+    //         if (tempAcc){
+    //             return '<p><span style="font-size: 36px; color: rgb(65, 168, 95);">Correct!</span></p>';
+    //         }
+    //         return '<p><span style="font-size: 36px; color: rgb(209, 72, 65);">Incorrect</span></p>';
+    //     },
+    //     choices: ['Continue']
+    // }
+
 
     // Production training trials - grid of nine images, each trial highlights one of the nine images and plays "This is a...", participant names image out loud, followed by feedback (audio of correct name)
     let prod_practice = {
@@ -263,7 +279,7 @@ jatos.studySessionData.version = version;
       recording_duration: 1000000,
       show_done_button: false,
       data: {
-        task: 'training',
+        task: 'prod_training_practice',
         block: 'practice',
       },
     };
@@ -298,7 +314,7 @@ jatos.studySessionData.version = version;
       trial_duration: null, // ADD TRIAL DURATION??
       response_allowed_while_playing: false,
       data: {
-        task: 'training',
+        task: 'test_training',
         block: 'practice',
       },
     };
@@ -316,6 +332,7 @@ jatos.studySessionData.version = version;
       if (jsPsych.timelineVariable('block') == "unrelated") {
         image = unrel_image_list[jsPsych.timelineVariable('index')];
       }
+      console.log(jsPsych.timelineVariable('block'))
       return "<img class = 'img' src = '" + image + "'>";
     },
     audio_stimulus: function() {
@@ -665,134 +682,6 @@ jatos.studySessionData.version = version;
     },
   };
 
-  let final_test = {
-    type: jsPsychAudioImageButtonResponseNoFeedback,
-    stimulus: function() {
-      var word = jsPsych.timelineVariable("sound");
-      return "media/audio/Click" + word + ".flac";
-      },
-    choices: "",
-    button_html: function() {
-      let image_list = jsPsych.timelineVariable('images')
-
-      // Add target image to grid of nine images
-      let html_target_image = "<img class = 'jspsych-audio-button-response-button unselected' style = 'cursor: pointer;' id = 'target' data-choice = '{image: " + image_list[jsPsych.timelineVariable('index')] + "}' src = '" + image_list[jsPsych.timelineVariable('index')] + "'>";
-      let html_image_list = [html_target_image];
-
-      // Add each of the eight foil images to grid of nine images
-      for (let i = 0; i < image_list.length; i++) {
-        if (i != jsPsych.timelineVariable('index')) {
-          let html_foil_image = "<img class = 'jspsych-audio-button-response-button unselected' style = 'cursor: pointer;' id = 'foil' data-choice = '{image: " + image_list[i] + "}' src = '" + image_list[i] + "'>";
-          html_image_list.push(html_foil_image);
-        }
-      }
-
-      shuffle(html_image_list);
-
-      // Create HTML for grid
-      let html_images_string = html_image_list.join("");
-      return "<div class = 'grid'>" + html_images_string + "</div>";
-    },
-    trial_duration: null, // ADD TRIAL DURATION??
-    response_allowed_while_playing: false,
-    data: {
-      task: 'final',
-      block: jsPsych.timelineVariable('type'),
-      image: jsPsych.timelineVariable('image_list')[jsPsych.timelineVariable('index')],
-      word: jsPsych.timelineVariable('sound'),
-    },
-  };
-
-  // Final Test - testing each target once, pulling 3 stimuli from each block type
-  var trial_structure = function(){
-    var all_stims = []
-    var targets = [
-      {type_num: 0, type: "sem", indicies: _.range(9)},
-      {type_num: 1, type: "unrel", indicies: _.range(9)},
-      {type_num: 2, type: "phon", indicies: _.range(9)}]
-
-    var original_foils = _.cloneDeep(targets)
-    var foils = _.cloneDeep(original_foils)
-
-    _.map(targets, function(o){o['indicies'] = _.shuffle(o['indicies'])})
-    _.map(foils, function(o){o['indicies'] = _.shuffle(o['indicies'])})
-
-    var types = ["sem", "unrel", "phon"]
-
-    var this_type_array;
-    var this_target;
-    var this_foils = [];
-    var tmp_foils;
-    var target_idx;
-    var target_image;
-    var target_word;
-
-    for (var i = 0; i < 9; i++) {
-      for(const this_type of types) {
-
-        this_type_array =  _.find(targets, ['type', this_type])
-        this_target = this_type_array['indicies'].splice(0,1)
-        this_type_num = this_type_array['type_num']
-
-        target_image = all_image_list[this_type_num][this_target]
-        target_word = all_word_list[this_type_num][this_target]
-
-        this_foils = [];
-
-        var image_list = [];
-        image_list.push(target_image)
-
-
-        for(const this_foil_type of types) {
-
-          if(this_foil_type == this_type) {
-            tmp_foils = _.find(foils, ['type', this_foil_type])
-            tmp_foil_images = tmp_foils['indicies']
-
-            target_idx = tmp_foil_images.findIndex((element) => element == this_target)
-
-            if(target_idx == 0) {
-              to_push = tmp_foil_images.splice(1,2)
-              for (this_item of to_push) {
-                this_foils.push(all_image_list[this_type_num][this_item])
-              }
-
-            } else if(target_idx == 1) {
-              this_foils.push(all_image_list[this_type_num][tmp_foil_images.splice(0,1)])
-              this_foils.push(all_image_list[this_type_num][tmp_foil_images.splice(1,1)])
-
-            } else {
-              to_push = tmp_foil_images.splice(0,2)
-              for (this_item of to_push) {
-                this_foils.push(all_image_list[this_type_num][this_item])
-              }
-            }
-          } else {
-            tmp_foils = _.find(foils, ['type', this_foil_type])
-            tmp_foil_images = tmp_foils['indicies']
-            var other_type_num = tmp_foils['type_num']
-            to_push = tmp_foil_images.splice(0,3)
-            for (this_item of to_push) {
-              this_foils.push(all_image_list[other_type_num][this_item])
-            }
-          }
-        }
-        image_list.push(this_foils)
-
-        image_list = _.flatten(image_list)
-        image_list = _.shuffle(image_list)
-
-        target_foil_index = image_list.findIndex((element) => element == target_image)
-
-        all_stims.push({"index": target_foil_index, "images":image_list, "sound": target_word, "type": this_type})
-      }
-      foils = _.cloneDeep(original_foils)
-    }
-    return all_stims
-  }
-
-  var final_block_stims = trial_structure()
-
   // BEGIN EXPERIMENT
 
   let welcome = {
@@ -806,7 +695,7 @@ jatos.studySessionData.version = version;
               `,
     choices: ['Continue'],
     data: {
-      condition: condition,
+      condition: version,
       sem_image_list: sem_image_list,
       sem_word_list: sem_word_list,
       phon_image_list: phon_image_list,
@@ -906,7 +795,7 @@ jatos.studySessionData.version = version;
         type:jsPsychVideoButtonResponse,
         stimulus: ["media/video/CompCorrect.mp4"],
         choices: ['Continue'],
-        prompt: "Here is a video demonstrating a participant selecting the correct picture.",
+        prompt: "Here is a video demonstrating a participant selecting the <b>correct</b> picture.",
         response_allowed_while_playing: false,
         width: 600,
         height: 400,
@@ -916,7 +805,7 @@ jatos.studySessionData.version = version;
         type:jsPsychVideoButtonResponse,
         stimulus: ["media/video/CompIncorrect.mp4"],
         choices: ['Continue'],
-        prompt: "Here is a video demonstrating a participant selecting the incorrect picture.",
+        prompt: "Here is a video demonstrating a participant selecting the <b>incorrect</b> picture.",
         response_allowed_while_playing: false,
         width: 600,
         height: 400,
@@ -947,6 +836,7 @@ jatos.studySessionData.version = version;
       stimulus: `
                 <div class = "instructions_text">
                  <p>You will first practice learning one word before proceeding to the study. </p>
+                 <p>For each task, you will first see a video demonstration, then you will practice the task yourself. </p>
                  <p>Press 'Continue' to proceed.</p>
                </div>
               `,
@@ -968,7 +858,7 @@ jatos.studySessionData.version = version;
     type: jsPsychHtmlButtonResponse,
     stimulus: `
               <div class = "instructions_text">
-                <p>You will now be shown each picture and told its name.</p>
+                <p>You will now see a picture and hear its name.</p>
                 <p>Please <b> repeat the name aloud </b> before hitting "Continue".</p>
                 <p>Press "Continue" to proceed.</p>
               </div>
@@ -981,8 +871,8 @@ jatos.studySessionData.version = version;
     type: jsPsychHtmlButtonResponse,
     stimulus: `
               <div class = "instructions_text">
-                <p>You will now see all nine pictures and will be told the name of the image in the blue border.</p>
-                <p> When the border turns green <b> click on that image </b> to proceed to the next trial.
+                <p>You will now see all nine pictures and will be told the name of the image in the <span style = 'font-weight: bold; color: blue'> blue border.</p>
+                <p> When the border turns <span style = 'font-weight: bold; color: green'> green</span> <b> click on that image </b> to proceed to the next trial.
                 <p>Press "Continue" to proceed.</p>
               </div>
               `,
@@ -995,7 +885,7 @@ jatos.studySessionData.version = version;
     stimulus: `
               <div class = "instructions_text">
                 <p>You will now see all nine pictures and will be told to <b> click on </b> one of the images.</p>
-                <p>After you select, the correct response will be shown by a green border.</p>
+                <p>After you select, the correct response will be shown by a <span style = 'font-weight: bold; color: green'> green </span> border.</p>
                 <p>Press "Continue" to proceed.</p>
               </div>
               `,
@@ -1007,8 +897,9 @@ jatos.studySessionData.version = version;
     type: jsPsychHtmlButtonResponse,
     stimulus: `
               <div class = "instructions_text">
-                <p>You will now see all nine pictures, and one will have a blue border.</p>
-                <p>Please <b> speak aloud </b> the correct name for the image in the blue border. </p>
+                <p>You will now see all nine pictures, and one will have a <span style = 'font-weight: bold; color: blue'> blue </span> border.</p>
+                <p>Please <b> speak aloud </b> the correct name for the image in the <span style = 'font-weight: bold; color: blue'> blue </span> border. </p>
+                <p>Then <b> click on </b> the image in the <span style = 'font-weight: bold; color: blue'> blue </span> border to hear the correct name. </p>
                 <p>If you don't know the word, <b> give your best guess. </b> </p>
                 <p>After you press "Continue", you will then hear the speaker say the correct name.</p>
                 <p>Press "Continue" to proceed.</p>
@@ -1023,6 +914,7 @@ jatos.studySessionData.version = version;
     stimulus: `
               <div class = "instructions_text">
                 <p>You will now see all nine pictures and will be told to <b> click on </b> one of the images.</p>
+                <p> You will <b> not </b> receive any feedback after your selection.</p>
                 <p>Press "Continue" to proceed.</p>
               </div>
               `,
@@ -1053,24 +945,24 @@ jatos.studySessionData.version = version;
 
   }
 
-  let final_trial_directions = {
+  let video_directions = {
     type: jsPsychHtmlButtonResponse,
     stimulus: `
               <div class = "instructions_text">
-                <p>Now all three of the sets you practiced will be combined.</p>
-                <p>You will see a grid of nine pictures and will be told to <b> click on </b> one of the images.</p>
+                <p>You will first see a video demonstration of the task.</p>
                 <p>Press "Continue" to proceed.</p>
               </div>
               `,
     choices: ['Continue'],
+
   }
 
   // Establish condition
-  if (condition == 1) {
+  if (version == 1) {
     var training = study_training
     var training_directions = study_directions
   }
-  else if (condition == 2) {
+  else if (version == 2) {
     var training = comp_training
     var training_directions = comp_directions
   } else {
@@ -1126,6 +1018,7 @@ jatos.studySessionData.version = version;
 
   // Complete semantic block
   let sem_block = {
+    name: 'sem-block',
     timeline: [sem_preload, intro_directions, sem_introduction_trials,
       training_directions, sem_training_trials, test_directions, sem_test_trials],
   };
@@ -1170,6 +1063,7 @@ jatos.studySessionData.version = version;
 
   // Complete phonological block
   let phon_block = {
+    name: 'phon-block',
     timeline: [phon_preload, intro_directions, phon_introduction_trials,
       training_directions, phon_training_trials, test_directions, phon_test_trials],
   };
@@ -1214,53 +1108,47 @@ jatos.studySessionData.version = version;
 
   // Complete unrelated block
   let unrel_block = {
+    name: 'unrel-block',
     timeline: [unrel_preload, intro_directions,
       unrel_introduction_trials, training_directions, unrel_training_trials,
       test_directions, unrel_test_trials],
   };
 
-//FINAL BLOCK
-  let final_test_trials = {
-    timeline: [fixation, final_test],
-    timeline_variables: final_block_stims,
-    randomize_order: false,
-    }
-
   // CREATE AND RUN TIMELINE
-
-  let timelineBare = [welcome, sem_preload, phon_preload, unrel_preload,
-    final_trial_directions, final_test_trials]
-  // let timelineBare = [welcome, practice_preload, loop_mic_check, practice_start,
-  //   intro_directions, intro_video, turn_directions, intro_practice]
+  let timelineBare = [welcome, practice_preload, loop_mic_check, practice_start,
+    intro_directions, video_directions, intro_video, turn_directions,
+    intro_practice]
   // // Establish condition
-  // if (condition == 1) {
-  //   timelineBare.push(study_directions, study_video, turn_directions,
-  //     study_practice)
-  // } else if (condition == 2) {
-  //   timelineBare.push(comp_directions, comp_correct_video, comp_incorrect_video,
-  //     turn_directions, comp_practice)
-  // } else {
-  //   timelineBare.push(prod_directions, prod_video, turn_directions,
-  //     prod_practice)
-  // }
-  // timelineBare.push(test_directions, test_video, turn_directions,
-  //   test_practice)
-  //
-  // let blocks = [sem_block, phon_block, unrel_block]
-  // shuffle(blocks);
-  // timelineBare.push(experiment_start, blocks[0], break_directions, blocks[1],
-  //   break_directions, blocks[2], final_trial_directions, final_test_trials)
+  if (version == 1) {
+    timelineBare.push(study_directions, video_directions, study_video,
+      turn_directions, study_practice)
+  } else if (version == 2) {
+    timelineBare.push(comp_directions, video_directions, comp_correct_video,
+      comp_incorrect_video, turn_directions, comp_practice, practice_feedback)
+  } else {
+    timelineBare.push(prod_directions, video_directions, prod_video,
+      turn_directions, prod_practice)
+  }
+  timelineBare.push(test_directions, video_directions, test_video, turn_directions,
+    test_practice)
 
+  let blocks = [sem_block, phon_block, unrel_block]
+  shuffle(blocks);
+
+  let order = blocks.map(a => a.name)
+  jatos.studySessionData.order = order;
+
+  timelineBare.push(experiment_start, blocks[0], break_directions, blocks[1], break_directions, blocks[2])
 
   let completeTimeline = {
       timeline: timelineBare,
       data: {
           version: version,
+          order: order,
           // This key-value pair labels every trial as part of the Component "experiment". This is useful when parsing your raw data.
           // For example, you can use this label to categorize your data and create separate CSVs for different Components.
           // You will most likely want to change this for each component.
           component: 'experiment',
-
           // We recommend you keep this addition to each trial.
           // jatos.studySessionData was described above in the counterbalancing section. This data is accessible to every Component in a single participant's run of the study.
           // In the 'consent.html' template, Study Session data was created. It is an object with:

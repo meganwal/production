@@ -136,7 +136,13 @@ var jsPsychAudioImageButtonResponseStudy = (function (jspsych) {
 
               // MODIFICATION: Removed all building of image-buttons. This is instead done when the plugin is called, and added to the HTML here via button_html.
               //display buttons
-              var html = '<div id="jspsych-audio-button-response-btngroup">';
+              // var html = '<div id="jspsych-audio-button-response-btngroup">';
+              // html += trial.button_html;
+              // html += '<span class = "hidden_text" id = "reminder"> Please respond. </span>'
+              // html += "</div>";
+
+              var html = '<span class= "reminder_text"> Click on the image when the border turns green to progress </span>';
+              html += '<div id="jspsych-audio-button-response-btngroup">';
               html += trial.button_html;
               html += '<span class = "hidden_text" id = "reminder"> Please respond. </span>'
               html += "</div>";
@@ -150,7 +156,7 @@ var jsPsychAudioImageButtonResponseStudy = (function (jspsych) {
               this.jsPsych.pluginAPI.setTimeout(()=> {
                   target_selected.classList.replace('selected','correct')
                   enable_buttons()
-                }, 3000);
+                }, 4000);
               // MODIFICATION: reminder appears after 6 seconds
               var hidden_message = null
               this.jsPsych.pluginAPI.setTimeout(()=> {

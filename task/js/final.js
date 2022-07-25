@@ -7,6 +7,7 @@ jatos.onLoad(function() {
       let resultJson = jsPsych.data.get().json();
       jatos.submitResultData(resultJson);
       component_ending = true
+      jatos.studySessionData.trial2 = true
       jatos.startNextComponent();
     },
     on_close: function() {
@@ -42,9 +43,6 @@ let all_word_list = jatos.studySessionData.all_word_list
 
 // retrieve contition
 let condition = jatos.studySessionData.version
-
-var all_image_list = [sem_image_list, unrel_image_list, phon_image_list]
-var all_word_list = [sem_word_list, unrel_word_list, phon_word_list]
 
 // Final Test - testing each target once, pulling 3 stimuli from each block type
 var trial_structure = function(){
@@ -179,9 +177,18 @@ let final_test = {
   trial_duration: null, // ADD TRIAL DURATION??
   response_allowed_while_playing: false,
   data: {
-    task: 'final',
+    task: function() {
+      if (jatos.studySessionData.trial2 == true) {
+        return 'final2'
+      } else {
+        return 'final'
+      }
+    },
     block: jsPsych.timelineVariable('type'),
-    image: jsPsych.timelineVariable('image_list')[jsPsych.timelineVariable('index')],
+    image: function(){
+      let image_list = jsPsych.timelineVariable('images')
+      return image_list[jsPsych.timelineVariable('index')]
+    },
     word: jsPsych.timelineVariable('sound'),
   },
 };
@@ -221,32 +228,24 @@ let final_trial_directions = {
   choices: ['Continue'],
 }
 
-let final_break = {
-  type: jsPsychHtmlButtonResponse,
-  stimulus: `
-            <div class = "instructions_text">
-              <p>You may now take a break.</p>
-              <p>This page will progress automatically in 3 minutes.</p>
-            </div>
-            `,
-  choices: ['Continue'],
-  trial_duration: 180000,
-  response_ends_trial: false,
-}
-
-let timelineBare = [final_break, final_trial_directions, preload, final_test_trials]
+let timelineBare = [final_trial_directions, preload, final_test_trials]
 
 
   let completeTimeline = {
       timeline: timelineBare,
       data: {
-          version: version,
+          version: condition,
 
           // This key-value pair labels every trial as part of the Component "experiment". This is useful when parsing your raw data.
           // For example, you can use this label to categorize your data and create separate CSVs for different Components.
           // You will most likely want to change this for each component.
-          component: 'final',
-
+          component: function() {
+            if (jatos.studySessionData.trial2 == true) {
+              return 'final2'
+            } else {
+              return 'final'
+            }
+          },
           // We recommend you keep this addition to each trial.
           // jatos.studySessionData was described above in the counterbalancing section. This data is accessible to every Component in a single participant's run of the study.
           // In the 'consent.html' template, Study Session data was created. It is an object with:
@@ -256,3 +255,5 @@ let timelineBare = [final_break, final_trial_directions, preload, final_test_tri
   }
   let timeline = [completeTimeline];
   jsPsych.run(timeline);
+
+});
